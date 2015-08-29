@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Document Difficulty Prediction",
+  "version": "0.1",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "permissions": [
+   "activeTab",
+   "https://docs.google.com/",
+   "webRequest"
+   ]
+}
