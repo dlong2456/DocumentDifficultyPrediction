@@ -1,18 +1,24 @@
-chrome.webRequest.onBeforeRequest.addListener(
-function(request) {
-    if (request.url.indexOf('/save?') != -1) {
-      var requestBody = request.requestBody;
-      var docId = request.url.match("docs\.google\.com\/document\/d\/(.*?)\/save")[1];
+$("#dialog").dialog( {
+	autoOpen: true,
+	dialogClass: "no-close",
+	buttons: [
+	{
+		text: "Yes",
+		click: function() {
+			//ask what kind of difficulty?
+			//then send message with difficulty
+			// chrome.runtime.sendMessage({type:'difficulty_type'});
+			$(this).dialog("close");
+		}
+	},
+	{
+		text: "No",
+		click: function() {
+			$(this).dialog("close");
+		}
+	}
+	]
+});
 
-      var data = {
-        "bundles": requestBody.formData.bundles,
-        "revNo": requestBody.formData.rev,
-        "docId": docId,
-        "timeStamp" : parseInt(request.timeStamp, 10)
-      };
-      console.log(data);
-    }
-  },
-  { urls: ["*://docs.google.com/*"] },
-  ['requestBody']
-);
+//this isn't working
+$("#dialog").dialog("open");
