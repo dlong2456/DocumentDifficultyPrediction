@@ -7,18 +7,18 @@
     "persistent": true
   },
   "permissions": [
-   "activeTab",
-   "https://docs.google.com/",
-   "webRequest"
+    "webRequest",
+    "activeTab",
+    "tabs",
+    "management",
+    "*://*.google.com/"
    ], 
   "content_scripts": [
-    {
-      "matches": [
-            "http://*/*",
-            "https://*/*"
-      ],
-      "css": ["thirdParty/jquery-ui-1.11.4.custom/jquery-ui.css"],
-      "js": ["thirdParty/jquery-1.11.3.js", "thirdParty/jquery-ui-1.11.4.custom/jquery-ui.js", "content.js"]
-    }
+  {
+    "matches": [
+        "<all_urls>"
+    ],
+    "js": ["content.js"]
+  }
   ]
 }
