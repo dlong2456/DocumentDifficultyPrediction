@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="EventLogger Plugin Update Site" url="http://fluorite-eclipse.googlecode.com/hg/edu.cmu.scs.fluorite.update/">
+      Eclipse Helper
+   </description>
+   <feature url="features/edu.cmu.scs.fluorite_0.5.2.201211261027.jar" id="edu.cmu.scs.fluorite" version="0.5.2.201211261027">
+      <category name="Fluorite"/>
+   </feature>
+   <category-def name="Fluorite" label="Eclipse Helper"/>
+</site>

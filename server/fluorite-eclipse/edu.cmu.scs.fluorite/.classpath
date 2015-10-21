@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/jackson-core-asl-1.9.13.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/jackson-mapper-asl-1.9.13.jar" sourcepath="C:/Users/Dewan/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13-sources.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/joda-time-2.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/joda-time-2.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jasoncarter/Documents/workspace/EclipseHelper/lib/joda-time-2.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/mysql-connector-java-5.1.25-bin.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/oeall22.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/smack-core-4.0.5.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/smack-tcp-4.0.5.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/weka.jar"/>
+	<classpathentry kind="lib" path="/EclipseHelper/lib/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
