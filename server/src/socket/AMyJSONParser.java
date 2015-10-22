@@ -17,7 +17,6 @@ import commands.NavigationCommand;
 import commands.StyleCommand;
 import predictions.ACommandPercentage;
 import predictions.CommandPercentage;
-import predictions.DecisionTreeModel;
 
 public class AMyJSONParser implements MyJSONParser {
 
@@ -26,8 +25,6 @@ public class AMyJSONParser implements MyJSONParser {
 		if (obj.has("type")) {
 			if (obj.get("type").equals("commandPercentage")) {
 				CommandPercentage commandPercentages = parseCommandPercentage(obj);
-				DecisionTreeModel decisionTreeModel = new DecisionTreeModel();
-				decisionTreeModel.predictSituation(commandPercentages.getInsertPercentage(), commandPercentages.getDebugPercentage(), commandPercentages.getNavigationPercentage(), commandPercentages.getStylePercentage(), commandPercentages.getDeletePercentage());
 			} else if (obj.get("type").equals("command")) {
 				parseCommand(obj);
 			}

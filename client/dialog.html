@@ -1,10 +1,41 @@
-<html>
-	<body>
-		 
-		<div id="dialog" title="My Dialog Title">
-		    <p>This is My Dialog box Description/Content</p>   
-		    <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+<!--Currently this is just a visual representation of the HTML for the Facing Difficulty dialog box. The goal is to use this document directly so that I don't have to convert it to a string every time I edit it.-->
+<div class="docs-docos-activitybox docos-enable-new-header" id="difficulty-box" aria-label="Difficulty box" tabindex="0" style="display: none;"> 
+	<div class="docs-docos-activitybox-inner" dir="ltr" style="text-align: left;"> 
+		<div class="docos docos-streampane-container docos-enable-docs-header" tabindex="0"> 
+			<div class="docos-streampane-content"> 
+				<div class="docos-streampane-header">
+					<div id = "typeButton" class = "goog-inline-block goog-flat-menu-button" aria-haspopup="true" aria-expanded="false" style="-webkit-user-select: none;">
+						<div class="goog-inline-block goog-flat-menu-button-caption">
+							<div class="docos-ns-caption">
+								<div class="docos-ns-caption-text" data-tooltip="Select the type of difficulty you are facing" aria-label: "Select the type of difficulty you are facing">
+									<div class="docos-ns-caption-text-value">Type</div>
+								</div>
+							</div>
+						</div>
+						<div class="goog-inline-block goog-flat-menu-button-dropdown" aria-hidden="true">&nbsp</div>
+					</div>
+					<div id = "difficultyTypeDropdown" class="goog-menu goog-menu-vertical" role = "menu" aria-haspopup= "true" style="-webkit-user-select: none; visibility: visible; display: none;">
+						<div class="goog-menuitem goog-option" role = "menuitemcheckbox" aria-checked = "true" aria-label: "Select if you are facing spelling difficulty" id="spelling" style: "-webkit-user-select: none;">
+							<div class="goog-menuitem-content" style: "-webkit-user-select: none;">
+								<div class="goog-menuitem-checkbox" id="spelling-check" style: "-webkit-user-select: none;"></div>
+								Spelling
+							</div>
+						</div>
+						<div class="goog-menuitem goog-option" role = "menuitemcheckbox" aria-checked = "true" aria-label: "Select if you are facing grammar difficulty" id="grammar" style: "-webkit-user-select: none;">
+							<div class="goog-menuitem-content" style: "-webkit-user-select: none;">
+								<div class="goog-menuitem-checkbox" id = "grammar-check" style: "-webkit-user-select: none;"></div>
+								Grammar
+							</div>
+						</div>
+						<div class="goog-menuitem goog-option" role = "menuitemcheckbox" aria-checked = "true" aria-label: "Select if you are facing content-related difficulty" id="content" style: "-webkit-user-select: none;">
+							<div class="goog-menuitem-content" style: "-webkit-user-select: none;">
+								<div class="goog-menuitem-checkbox" id = "content-check" style: "-webkit-user-select: none;"></div>
+								Content
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-	 
-	</body>
-</html>
+	</div>
+</div>

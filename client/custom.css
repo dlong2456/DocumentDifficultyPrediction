@@ -1,0 +1,14 @@
+/* Custom CSS document for Google Docs UI */
+#docs-docos-caret.custom {
+    position: relative;
+    left: -128px;
+}
+
+#difficulty-box.custom {
+	top: 70px;
+}
+
+#difficultyTypeDropdown.custom {
+	position: absolute;
+    top: 38px;
+}

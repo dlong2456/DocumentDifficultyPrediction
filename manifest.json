@@ -18,7 +18,9 @@
     "matches": [
         "<all_urls>"
     ],
-    "js": ["client/content.js"]
+    "js": ["client/thirdParty/jquery-2.1.4.min.js", "client/content.js"], 
+    "html": ["client/dialog.html"], 
+    "css": ["client/custom.css"]
   }
   ]
 }
