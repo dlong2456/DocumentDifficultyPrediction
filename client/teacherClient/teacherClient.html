@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Customers</title>
+		<link href="custom.css" rel="stylesheet">
+		<script src="script.js"></script>
+		<script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	</head>
+	<body>
+		<div id = "studentHeader">
+			<h1>{{name}}</h1>
+			<h2>{{status}}</h2> <!--Use angular if to change color-->
+		</div>
+		<div id="authorize-div" style="display: none">
+			<span>Authorize access to Drive API</span>
+			<!--Button for the user to click to initiate auth sequence -->
+			<button id="authorize-button" onclick="handleAuthClick(event)">
+		    	Authorize
+			</button>
+		</div>
+		<div> 
+	  		<button id="comment-button">Comment</button>
+	  		<input id="comment-content" type = "text"></input>
+		</div>
+		<iframe width='50%' height='1000'src="https://docs.google.com/document/d/17y99zDXlMPCOfNAZpEqaLw_Ak0RdWNDq8iAYvyV3xIQ/edit?usp=sharing"></iframe>
+		<pre id="output"></pre>
+	</body>
+</html>

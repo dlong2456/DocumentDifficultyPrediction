@@ -13,6 +13,7 @@ ws.onopen = function() {
 };
 
 ws.onmessage = function (evt) {
+  alert("Message Received!");
 };
 
 ws.onclose = function() {

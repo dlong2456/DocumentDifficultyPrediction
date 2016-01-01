@@ -4,6 +4,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
+import database.ADatabase;
+import database.Database;
 import socket.AWebSocketHandler;
 
 public class Driver {
@@ -19,5 +21,6 @@ public class Driver {
 		server.setHandler(wsHandler);
 		server.start();
 		server.join();
+		Database db = new ADatabase();
 	}
 }

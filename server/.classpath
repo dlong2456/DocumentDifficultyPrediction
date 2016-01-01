@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.3.3.v20150827/lib/jetty-http-9.3.3.v20150827.jar"/>
 	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.3.3.v20150827/lib/jetty-io-9.3.3.v20150827.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
+	<classpathentry kind="lib" path="/Users/Duri/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

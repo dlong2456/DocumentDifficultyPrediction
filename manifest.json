@@ -3,7 +3,7 @@
   "name": "Document Difficulty Prediction",
   "version": "0.1",
   "background": {
-    "scripts": ["client/background.js"],
+    "scripts": ["client/studentClient/background.js"],
     "persistent": true
   },
   "permissions": [
@@ -18,9 +18,9 @@
     "matches": [
         "<all_urls>"
     ],
-    "js": ["client/thirdParty/jquery-2.1.4.min.js", "client/content.js"], 
-    "html": ["client/dialog.html"], 
-    "css": ["client/custom.css"]
+    "js": ["client/thirdParty/jquery-2.1.4.min.js", "client/studentClient/content.js"], 
+    "html": ["client/studentClient/dialog.html"], 
+    "css": ["client/studentClient/custom.css"]
   }
   ]
 }

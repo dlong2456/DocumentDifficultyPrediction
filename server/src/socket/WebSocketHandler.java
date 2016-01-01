@@ -18,4 +18,5 @@ public interface WebSocketHandler {
 
 	@OnWebSocketMessage
 	public void onMessage(String message);
+	public Session getSession();
 }
