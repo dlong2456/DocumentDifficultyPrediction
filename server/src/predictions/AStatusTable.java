@@ -1,7 +1,7 @@
 package predictions;
 
 import java.util.ArrayList;
-
+//TODO: Is this necessary?
 public class AStatusTable implements StatusTable {
 	
 	private ArrayList<Integer> keys = new ArrayList<Integer>();

@@ -399,4 +399,20 @@ public class ADatabase implements Database {
 		}
 		return status;
 	}
+	
+	public void setStudentStatus(Integer studentID, String status) {
+		Connection conn = connectToDatabase();
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			String sql = "UPDATE Student"
+					+ "SET status = '" + status + "'"
+					+ "WHERE studentID = '" + studentID + "'";
+			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeAndCleanup(conn, stmt, null);
+		}
+	}
 }

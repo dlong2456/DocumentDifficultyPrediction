@@ -6,6 +6,16 @@ var spellcheckCommands = [];
 var collaborationCommands = [];
 var numberOfCommands = 0;
 
+//MESSGE PASSING to content.js
+
+sendToContent = function(message) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {message: message}, function(response) {
+      console.log(response);
+    });
+  });
+}
+
 //Web socket functionality
 var ws = new WebSocket("ws://127.0.0.1:8080/");
 
@@ -13,7 +23,7 @@ ws.onopen = function() {
 };
 
 ws.onmessage = function (evt) {
-  alert("Message Received!");
+    sendToContent(evt.data);
 };
 
 ws.onclose = function() {
@@ -58,9 +68,10 @@ function newCommand() {
 //Listen for insert, style, and delete commands
 chrome.webRequest.onBeforeRequest.addListener(
   function(request) {
+      console.log(request + "\n");
       if (request.url.indexOf('/save?') != -1) {
         var requestBody = request.requestBody;
-        var docId = request.url.match("docs\.google\.com\/document\/d\/(.*?)\/save")[1];
+        // var docId = request.url.match("docs\.google\.com\/document\/d\/(.*?)\/save")[1];
         var data = {
           "bundles": requestBody.formData.bundles,
           "timeStamp" : parseInt(request.timeStamp, 10)

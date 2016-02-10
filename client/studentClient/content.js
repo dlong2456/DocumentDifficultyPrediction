@@ -15,7 +15,7 @@ $progress_button.addClass('jfk-button-clear-outline');
 
 //Set difficulty status and create status display
 //TODO: Set this variable using data from backend
-var statusText = 'Progress'; //either 'Progress' or 'Slow progress'
+var statusText = 'No status yet'; //either 'Progress' or 'Slow progress'
 var $status = $('<div id="status" class="goog-inline-block" aria-label="Difficulty status" style="-webkit-user-select: none;" tabindex="0"><span id="status-text" style = "color: #458B00">' + statusText + '</span>&nbsp;&nbsp;&nbsp;&nbsp;</div>');
 $status.prependTo($('.docs-titlebar-buttons'));
 
@@ -28,7 +28,7 @@ $('#difficultyTypeDropdown').addClass('custom');
 
 //Function that changes the color of the difficulty status display according to the text being displayed
 function changeColor() {
-	if (statusText == 'Progress') {
+	if (statusText === 'Progress') {
 		//Green
 		document.getElementById('status-text').style.color = "#32CD32";
 	} else {
@@ -273,8 +273,18 @@ $(".kix-appview-editor").scroll(function() {
 
 //***MESSAGE HANDLING CODE***//
 
+//receive messages from backend.js
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-  //receive messages from backend.js
-  }
+	function(request, sender, sendResponse) {
+		console.log("message received: " + request.message);
+		if (request.message === 'Status: 0') {
+			statusText = 'Slow progress';
+			$('#status-text').text(statusText);
+			changeColor();
+		} else if (request.message === 'Status: 1') {
+			statusText = 'Progress';
+			$('#status-text').text(statusText);
+			changeColor();
+		}
+	}
 );

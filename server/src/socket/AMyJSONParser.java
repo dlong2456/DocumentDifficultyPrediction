@@ -1,7 +1,5 @@
 package socket;
 
-import java.util.Date;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,12 +11,24 @@ import commands.AnInsertCommand;
 import commands.DebugCommand;
 import commands.DeleteCommand;
 import commands.InsertCommand;
-import commands.NavigationCommand;
 import commands.StyleCommand;
+import difficultyPrediction.statusManager.StatusListener;
+import edu.cmu.scs.fluorite.commands.CutCommand;
+import edu.cmu.scs.fluorite.commands.ICommand;
+import edu.cmu.scs.fluorite.commands.RunCommand;
+import edu.cmu.scs.fluorite.commands.SelectTextCommand;
 import predictions.ACommandPercentage;
+import predictions.ADocumentPredictionManager;
 import predictions.CommandPercentage;
+import predictions.DocumentPredictionManager;
 
 public class AMyJSONParser implements MyJSONParser {
+
+	private DocumentPredictionManager predictionManager;
+
+	public AMyJSONParser(WebSocketHandler webSocketHandler) {
+		predictionManager = new ADocumentPredictionManager(webSocketHandler);
+	}
 
 	public Object parse(String jsonString) {
 		JSONObject obj = new JSONObject(jsonString);
@@ -43,25 +53,35 @@ public class AMyJSONParser implements MyJSONParser {
 		for (int i = 0; i < insertCommands.length(); i++) {
 			InsertCommand insertCommand = new AnInsertCommand();
 			insertCommandObject = insertCommands.getJSONObject(i);
-			insertCommand.setTimestamp(new Date(insertCommandObject.getLong("timeStamp")));
+			((ICommand) insertCommand).setTimestamp(insertCommandObject.getLong("timeStamp"));
 			insertCommand.setContent(insertCommandObject.getString("content"));
 			insertCommand.setIndex(insertCommandObject.getInt("index"));
-			System.out.println("Insert Command Content: " + insertCommand.getContent());
-			System.out.println("Insert Command Index: " + insertCommand.getIndex());
-			System.out.println("Insert Command Timestamp: " + insertCommand.getTimestamp());
-			// TODO: do something with this command. Store it?
+			// System.out.println("Insert Command Content: " +
+			// insertCommand.getContent());
+			// System.out.println("Insert Command Index: " +
+			// insertCommand.getIndex());
+			// System.out.println("Insert Command Timestamp: " +
+			// ((AbstractCommand) insertCommand).getTimestamp());
+			// predictionManager.processEvent((ICommand) insertCommand);
+			ICommand cutCommand = new CutCommand();
+			predictionManager.processEvent(cutCommand);
 		}
 		JSONArray deleteCommands = obj.getJSONArray("deleteCommands");
 		for (int i = 0; i < deleteCommands.length(); i++) {
 			DeleteCommand deleteCommand = new ADeleteCommand();
 			deleteCommandObject = deleteCommands.getJSONObject(i);
-			deleteCommand.setTimestamp(new Date(deleteCommandObject.getLong("timeStamp")));
+			((ICommand) deleteCommand).setTimestamp(deleteCommandObject.getLong("timeStamp"));
 			deleteCommand.setEndIndex(deleteCommandObject.getInt("endIndex"));
 			deleteCommand.setStartIndex(deleteCommandObject.getInt("startIndex"));
-			System.out.println("Delete Command Timestamp: " + deleteCommand.getTimestamp());
-			System.out.println("Delete Command Start Index: " + deleteCommand.getStartIndex());
-			System.out.println("Delete Command End Index: " + deleteCommand.getEndIndex());
-			// TODO: do something with this command. Store it?
+			// System.out.println("Delete Command Timestamp: " +
+			// ((AbstractCommand) deleteCommand).getTimestamp());
+			// System.out.println("Delete Command Start Index: " +
+			// deleteCommand.getStartIndex());
+			// System.out.println("Delete Command End Index: " +
+			// deleteCommand.getEndIndex());
+			// predictionManager.processEvent((ICommand) deleteCommand);
+			ICommand runCommand = new RunCommand();
+			predictionManager.processEvent(runCommand);
 		}
 		// TODO: Bug with parsing style commands. "not a JSON object"
 		JSONArray styleCommands = obj.getJSONArray("styleCommands");
@@ -69,49 +89,60 @@ public class AMyJSONParser implements MyJSONParser {
 		for (int i = 0; i < styleCommands.length(); i++) {
 			StyleCommand styleCommand = new AStyleCommand();
 			styleCommandObject = styleCommands.getJSONObject(i);
-			styleCommand.setTimestamp(new Date(styleCommandObject.getLong("timeStamp")));
+			((ICommand) styleCommand).setTimestamp(styleCommandObject.getLong("timeStamp"));
 			styleCommand.setEndIndex(styleCommandObject.getInt("endIndex"));
 			styleCommand.setStartIndex(styleCommandObject.getInt("startIndex"));
 			styleCommand.setType(styleCommandObject.getString("type"));
-			System.out.println("Style Command Timestamp: " + styleCommand.getTimestamp());
-			System.out.println("Style Command Start Index: " + styleCommand.getStartIndex());
-			System.out.println("Style Command End Index: " + styleCommand.getEndIndex());
-			System.out.println("Style Command Type: " + styleCommand.getType());
-			// TODO: do something with this command. Store it?
+			// System.out.println("Style Command Timestamp: " +
+			// ((AbstractCommand) styleCommand).getTimestamp());
+			// System.out.println("Style Command Start Index: " +
+			// styleCommand.getStartIndex());
+			// System.out.println("Style Command End Index: " +
+			// styleCommand.getEndIndex());
+			// System.out.println("Style Command Type: " +
+			// styleCommand.getType());
+			ICommand selectTextCommand = new SelectTextCommand();
+			predictionManager.processEvent(selectTextCommand);
+			// predictionManager.processEvent((ICommand) styleCommand);
 		}
 		JSONArray navigationCommands = obj.getJSONArray("navigationCommands");
 		for (int i = 0; i < navigationCommands.length(); i++) {
-			NavigationCommand navigationCommand = new ANavigationCommand();
+			ICommand navigationCommand = new ANavigationCommand();
 			navigationCommandObject = navigationCommands.getJSONObject(i);
-			navigationCommand.setTimestamp(new Date(navigationCommandObject.getLong("timeStamp")));
-			System.out.println("Navigation Command Timestamp: " + navigationCommand.getTimestamp());
-			// TODO: do something with this command. Store it?
+			navigationCommand.setTimestamp(navigationCommandObject.getLong("timeStamp"));
+			// System.out.println("Navigation Command Timestamp: " +
+			// navigationCommand.getTimestamp());
+			// predictionManager.processEvent(navigationCommand);
+			ICommand cutCommand = new CutCommand();
+			predictionManager.processEvent(cutCommand);
 		}
 		JSONArray spellcheckCommands = obj.getJSONArray("spellcheckCommands");
-		for (int i = 0; i<spellcheckCommands.length(); i++) {
+		for (int i = 0; i < spellcheckCommands.length(); i++) {
 			DebugCommand debugCommand = new ADebugCommand();
 			spellcheckCommandObject = spellcheckCommands.getJSONObject(i);
-			debugCommand.setTimestamp(new Date(spellcheckCommandObject.getLong("timeStamp")));
+			((ICommand) debugCommand).setTimestamp(spellcheckCommandObject.getLong("timeStamp"));
 			debugCommand.setType(spellcheckCommandObject.getString("type"));
-			System.out.println("Debug Command Timestamp: " + debugCommand.getTimestamp());
-			System.out.println("Debug Command Type: " + debugCommand.getType());
-			//TODO: do something with this command
+			// System.out.println("Debug Command Timestamp: " +
+			// ((AbstractCommand) debugCommand).getTimestamp());
+			// System.out.println("Debug Command Type: " +
+			// debugCommand.getType());
+			// predictionManager.processEvent((ICommand) debugCommand);
 		}
 		JSONArray collaborationCommands = obj.getJSONArray("collaborationCommands");
-		for (int i = 0; i<collaborationCommands.length(); i++) {
+		for (int i = 0; i < collaborationCommands.length(); i++) {
 			DebugCommand debugCommand = new ADebugCommand();
 			collaborationCommandObject = collaborationCommands.getJSONObject(i);
-			debugCommand.setTimestamp(new Date(collaborationCommandObject.getLong("timeStamp")));
+			((ICommand) debugCommand).setTimestamp(collaborationCommandObject.getLong("timeStamp"));
 			debugCommand.setType("collaborationCommand");
-			System.out.println("Debug Command Timestamp: " + debugCommand.getTimestamp());
-			System.out.println("Debug Command Type: " + debugCommand.getType());
-			//TODO: do something with this command
+			// System.out.println("Debug Command Timestamp: " +
+			// ((AbstractCommand) debugCommand).getTimestamp());
+			// System.out.println("Debug Command Type: " +
+			// debugCommand.getType());
+			// predictionManager.processEvent((ICommand) debugCommand);
 		}
 	}
 
 	private CommandPercentage parseCommandPercentage(JSONObject obj) {
-		// TODO: Do I need to do error checking if I am sending the objects and
-		// they always have these three properties?
 		CommandPercentage commandPercentageObject = new ACommandPercentage();
 		commandPercentageObject.setNavigationPercentage(obj.getDouble("navigationPercentage"));
 		commandPercentageObject.setDeletePercentage(obj.getDouble("deletionPercentage"));
@@ -124,6 +155,16 @@ public class AMyJSONParser implements MyJSONParser {
 		System.out.println("Style Percentage: " + commandPercentageObject.getStylePercentage());
 		System.out.println("Debug Percentage: " + commandPercentageObject.getDebugPercentage());
 		return commandPercentageObject;
+	}
+
+	public void addStatusListener(StatusListener aListener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void removeStatusListener(StatusListener aListener) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

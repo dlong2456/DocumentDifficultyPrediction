@@ -1,6 +1,6 @@
 package commands;
 
-public interface DeleteCommand extends Command {
+public interface DeleteCommand {
 
 	public int getStartIndex();
 

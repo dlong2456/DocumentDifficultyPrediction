@@ -35,4 +35,6 @@ public interface Database {
 
 	public String getStudentStatus(Integer studentID);
 
+	public void setStudentStatus(Integer studentID, String status);
+
 }

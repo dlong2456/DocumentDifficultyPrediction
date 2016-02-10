@@ -1,6 +1,6 @@
 package commands;
 
-public interface DebugCommand extends Command {
+public interface DebugCommand {
 	public String getType();
 
 	public void setType(String type);

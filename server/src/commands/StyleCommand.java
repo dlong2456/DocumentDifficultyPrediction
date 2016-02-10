@@ -1,6 +1,6 @@
 package commands;
 
-public interface StyleCommand extends Command {
+public interface StyleCommand {
 	
 	public int getStartIndex();
 

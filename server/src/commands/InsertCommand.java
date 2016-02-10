@@ -1,6 +1,6 @@
 package commands;
 
-public interface InsertCommand extends Command {
+public interface InsertCommand {
 
 	public int getIndex();
 
