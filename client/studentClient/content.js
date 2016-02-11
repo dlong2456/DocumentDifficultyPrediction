@@ -74,9 +74,8 @@ $progress_button.click(function() {
 		// Don't do anything
 	//Otherwise, select it and notify backend
     } else {
-		//Tell background.js that the user made a status correction
-		chrome.runtime.sendMessage({timestamp: Date.now(), facingDifficulty: false}, function(response) {
-			//handle response
+		//tell background.js that the user made a status correction
+		chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", makingProgress: 1}, function(response) {
 		});
 		//change status text and color
 		statusText = 'Progress';
@@ -151,13 +150,6 @@ $('#spelling').click(function() {
 		$('#grammar').removeClass('goog-option-selected');
 		$('#content').removeClass('goog-option-selected');
 		$('#spelling').addClass('goog-option-selected');
-		//change status text and color
-		statusText = 'Slow progress';
-		$('#status-text').text(statusText);
-		changeColor();
-		//tell background.js that the user made a status correction
-		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spelling", facingDifficulty: true}, function(response) {
-		});
 		//close dropdown
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
@@ -173,13 +165,6 @@ $('#grammar').click(function() {
 		$('#spelling').removeClass('goog-option-selected');
 		$('#content').removeClass('goog-option-selected');
 		$('#grammar').addClass('goog-option-selected');
-		//change status text and color
-		statusText = 'Slow progress';
-		$('#status-text').text(statusText);
-		changeColor();
-		//tell background.js that the user made a status correction
-		chrome.runtime.sendMessage({timestamp: Date.now(), type: "grammar", facingDifficulty: true}, function(response) {
-		});
 		//close dropdown
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
@@ -195,19 +180,32 @@ $('#content').click(function() {
 		$('#grammar').removeClass('goog-option-selected');
 		$('#spelling').removeClass('goog-option-selected');
 		$('#content').addClass('goog-option-selected');
-		//change status text and color
-		statusText = 'Slow progress';
-		$('#status-text').text(statusText);
-		changeColor();
-		//tell background.js that the user made a status correction
-		chrome.runtime.sendMessage({timestamp: Date.now(), type: "content", facingDifficulty: true}, function(response) {
-		});
 		//close dropdown
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
 		$('#difficultyTypeDropdown').hide();
 	}
 });
+
+$('#submit').click(function() {
+	//change status text and color
+	statusText = 'Slow progress';
+	$('#status-text').text(statusText);
+	changeColor();
+	//get info about difficulty type and details
+	var type;
+	if ($('#grammar').hasClass('goog-option-selected')) {
+		type = 'grammar';
+	} else if ($('#spelling').hasClass('goog-option-selected')) {
+		type = 'spelling';
+	} else if ($("#content").hasClass('goog-option-selected')) {
+		type = 'content';
+	}
+	console.log($('#status-content').val());
+	//tell background.js that the user made a status correction
+	chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", difficultyType: type, details: $('#status-content').val(), makingProgress: 0}, function(response) {
+	});
+})
 
 //Hover events
 $('#spelling').mouseenter(function() {
@@ -254,11 +252,17 @@ document.addEventListener("click",
 
 //****PAGE SCROLL AND MOUSEOVER LISTENERS****//
 
-//this only works for page scrolls right now (not scrolling in iframe)
-document.addEventListener("scroll",
-	function(event) {
-		//log scroll events
-	}
+// document.getElementById().addEventListener("click", 
+// 	function(event) {
+
+// 	});
+
+window.addEventListener('scroll', 
+	function(){ 
+		console.log("SCROLL");
+		//how often should I send these?
+		//how to get current page number?
+	}, true
 );
 
 //This works -- how many mouse moves do I actually want to listen to?  
@@ -266,22 +270,16 @@ document.addEventListener("mousemove", function(event) {
 	//log mouse move events
 });
 
-//class name of specific element being scrolled - this doesn't work yet
-$(".kix-appview-editor").scroll(function() {
-	//log scroll events
-});
-
 //***MESSAGE HANDLING CODE***//
 
 //receive messages from backend.js
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		console.log("message received: " + request.message);
-		if (request.message === 'Status: 0') {
+		if (request.message === '0') {
 			statusText = 'Slow progress';
 			$('#status-text').text(statusText);
 			changeColor();
-		} else if (request.message === 'Status: 1') {
+		} else if (request.message === '1') {
 			statusText = 'Progress';
 			$('#status-text').text(statusText);
 			changeColor();

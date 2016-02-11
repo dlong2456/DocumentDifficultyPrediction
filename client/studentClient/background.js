@@ -6,15 +6,34 @@ var spellcheckCommands = [];
 var collaborationCommands = [];
 var numberOfCommands = 0;
 
-//MESSGE PASSING to content.js
+//MESSAGE PASSING
 
+// Sending message to content.js
 sendToContent = function(message) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {message: message}, function(response) {
-      console.log(response);
     });
   });
-}
+};
+
+// Listening for message from content.js
+chrome.runtime.onMessage.addListener(function(request) {
+  //Spellcheck commands
+  if(request.type === "spellcheck_change" || request.type === "spellcheck_ignore" || request.type === "spellcheck_dictionary") {
+    var spellcheckCommand = new SpellcheckCommand(request.timestamp, request.type);
+    spellcheckCommands.push(spellcheckCommand);
+    newCommand();
+  }
+  if (request.type === "statusUpdate") {
+    var statusUpdateObject = {
+      type: "statusUpdate",
+      makingProgress: request.makingProgress,
+      difficultyType: request.difficultyType,
+      details: request.details
+    }
+    ws.send(JSON.stringify(statusUpdateObject));
+  }
+});
 
 //Web socket functionality
 var ws = new WebSocket("ws://127.0.0.1:8080/");
@@ -23,7 +42,12 @@ ws.onopen = function() {
 };
 
 ws.onmessage = function (evt) {
-    sendToContent(evt.data);
+    var data = evt.data;
+    var json = JSON.stringify(eval("(" + data + ")"));
+    var jsonData = JSON.parse(json);
+    if (jsonData.hasOwnProperty("status")) {
+      sendToContent(jsonData.status);
+    }
 };
 
 ws.onclose = function() {
@@ -68,7 +92,6 @@ function newCommand() {
 //Listen for insert, style, and delete commands
 chrome.webRequest.onBeforeRequest.addListener(
   function(request) {
-      console.log(request + "\n");
       if (request.url.indexOf('/save?') != -1) {
         var requestBody = request.requestBody;
         // var docId = request.url.match("docs\.google\.com\/document\/d\/(.*?)\/save")[1];
@@ -199,16 +222,6 @@ chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
   var navigationCommand = new NavigationCommand(Date.now());
   navigationCommands.push(navigationCommand);
   newCommand();
-});
-
-// Listening for message from content.js
-chrome.runtime.onMessage.addListener(function(request) {
-  //Spellcheck commands
-  if(request.type === "spellcheck_change" || request.type === "spellcheck_ignore" || request.type === "spellcheck_dictionary") {
-    var spellcheckCommand = new SpellcheckCommand(request.timestamp, request.type);
-    spellcheckCommands.push(spellcheckCommand);
-    newCommand();
-  }
 });
 
 function computeInsertPercentage() {

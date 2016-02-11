@@ -36,9 +36,6 @@ public class AWebSocketHandler implements WebSocketHandler {
 	// receives messages from the client(s)
 	@OnWebSocketMessage
 	public void onMessage(String message) {
-		// TODO: Handle user status changes.
-		// Maybe message is JSON with a statusVal and a statusID. After parsing,
-		// get(statusID) from statusTable and then setStatus on that instance
 		if (message.equals("Message Received")) { // Message from teacher client
 
 		} else { // Message from student client

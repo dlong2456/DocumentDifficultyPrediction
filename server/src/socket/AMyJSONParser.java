@@ -2,7 +2,6 @@ package socket;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import commands.ADebugCommand;
 import commands.ADeleteCommand;
 import commands.ANavigationCommand;
@@ -12,7 +11,6 @@ import commands.DebugCommand;
 import commands.DeleteCommand;
 import commands.InsertCommand;
 import commands.StyleCommand;
-import difficultyPrediction.statusManager.StatusListener;
 import edu.cmu.scs.fluorite.commands.CutCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.commands.RunCommand;
@@ -37,6 +35,8 @@ public class AMyJSONParser implements MyJSONParser {
 				CommandPercentage commandPercentages = parseCommandPercentage(obj);
 			} else if (obj.get("type").equals("command")) {
 				parseCommand(obj);
+			} else if (obj.get("type").equals("statusUpdate")) {
+				predictionManager.handleStatusUpdate(obj);
 			}
 		}
 		return obj;
@@ -56,12 +56,6 @@ public class AMyJSONParser implements MyJSONParser {
 			((ICommand) insertCommand).setTimestamp(insertCommandObject.getLong("timeStamp"));
 			insertCommand.setContent(insertCommandObject.getString("content"));
 			insertCommand.setIndex(insertCommandObject.getInt("index"));
-			// System.out.println("Insert Command Content: " +
-			// insertCommand.getContent());
-			// System.out.println("Insert Command Index: " +
-			// insertCommand.getIndex());
-			// System.out.println("Insert Command Timestamp: " +
-			// ((AbstractCommand) insertCommand).getTimestamp());
 			// predictionManager.processEvent((ICommand) insertCommand);
 			ICommand cutCommand = new CutCommand();
 			predictionManager.processEvent(cutCommand);
@@ -73,12 +67,6 @@ public class AMyJSONParser implements MyJSONParser {
 			((ICommand) deleteCommand).setTimestamp(deleteCommandObject.getLong("timeStamp"));
 			deleteCommand.setEndIndex(deleteCommandObject.getInt("endIndex"));
 			deleteCommand.setStartIndex(deleteCommandObject.getInt("startIndex"));
-			// System.out.println("Delete Command Timestamp: " +
-			// ((AbstractCommand) deleteCommand).getTimestamp());
-			// System.out.println("Delete Command Start Index: " +
-			// deleteCommand.getStartIndex());
-			// System.out.println("Delete Command End Index: " +
-			// deleteCommand.getEndIndex());
 			// predictionManager.processEvent((ICommand) deleteCommand);
 			ICommand runCommand = new RunCommand();
 			predictionManager.processEvent(runCommand);
@@ -93,14 +81,6 @@ public class AMyJSONParser implements MyJSONParser {
 			styleCommand.setEndIndex(styleCommandObject.getInt("endIndex"));
 			styleCommand.setStartIndex(styleCommandObject.getInt("startIndex"));
 			styleCommand.setType(styleCommandObject.getString("type"));
-			// System.out.println("Style Command Timestamp: " +
-			// ((AbstractCommand) styleCommand).getTimestamp());
-			// System.out.println("Style Command Start Index: " +
-			// styleCommand.getStartIndex());
-			// System.out.println("Style Command End Index: " +
-			// styleCommand.getEndIndex());
-			// System.out.println("Style Command Type: " +
-			// styleCommand.getType());
 			ICommand selectTextCommand = new SelectTextCommand();
 			predictionManager.processEvent(selectTextCommand);
 			// predictionManager.processEvent((ICommand) styleCommand);
@@ -110,8 +90,6 @@ public class AMyJSONParser implements MyJSONParser {
 			ICommand navigationCommand = new ANavigationCommand();
 			navigationCommandObject = navigationCommands.getJSONObject(i);
 			navigationCommand.setTimestamp(navigationCommandObject.getLong("timeStamp"));
-			// System.out.println("Navigation Command Timestamp: " +
-			// navigationCommand.getTimestamp());
 			// predictionManager.processEvent(navigationCommand);
 			ICommand cutCommand = new CutCommand();
 			predictionManager.processEvent(cutCommand);
@@ -122,10 +100,6 @@ public class AMyJSONParser implements MyJSONParser {
 			spellcheckCommandObject = spellcheckCommands.getJSONObject(i);
 			((ICommand) debugCommand).setTimestamp(spellcheckCommandObject.getLong("timeStamp"));
 			debugCommand.setType(spellcheckCommandObject.getString("type"));
-			// System.out.println("Debug Command Timestamp: " +
-			// ((AbstractCommand) debugCommand).getTimestamp());
-			// System.out.println("Debug Command Type: " +
-			// debugCommand.getType());
 			// predictionManager.processEvent((ICommand) debugCommand);
 		}
 		JSONArray collaborationCommands = obj.getJSONArray("collaborationCommands");
@@ -134,10 +108,6 @@ public class AMyJSONParser implements MyJSONParser {
 			collaborationCommandObject = collaborationCommands.getJSONObject(i);
 			((ICommand) debugCommand).setTimestamp(collaborationCommandObject.getLong("timeStamp"));
 			debugCommand.setType("collaborationCommand");
-			// System.out.println("Debug Command Timestamp: " +
-			// ((AbstractCommand) debugCommand).getTimestamp());
-			// System.out.println("Debug Command Type: " +
-			// debugCommand.getType());
 			// predictionManager.processEvent((ICommand) debugCommand);
 		}
 	}
@@ -155,16 +125,6 @@ public class AMyJSONParser implements MyJSONParser {
 		System.out.println("Style Percentage: " + commandPercentageObject.getStylePercentage());
 		System.out.println("Debug Percentage: " + commandPercentageObject.getDebugPercentage());
 		return commandPercentageObject;
-	}
-
-	public void addStatusListener(StatusListener aListener) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void removeStatusListener(StatusListener aListener) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

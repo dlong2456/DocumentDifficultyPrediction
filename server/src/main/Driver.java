@@ -1,5 +1,5 @@
 package main;
-//TODO: Commands are printing as "NULL" 
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
@@ -19,9 +19,9 @@ public class Driver {
 		server.setHandler(wsHandler);
 		server.start();
 		server.join();
-//		Database db = new ADatabase();
-//		System.out.println(db.getStudentStatus(1));
-//		db.setStudentStatus(1, "in difficulty");
-//		System.out.println(db.getStudentStatus(1));
+		// Database db = new ADatabase();
+		// System.out.println(db.getStudentStatus(1));
+		// db.setStudentStatus(1, "in difficulty");
+		// System.out.println(db.getStudentStatus(1));
 	}
 }

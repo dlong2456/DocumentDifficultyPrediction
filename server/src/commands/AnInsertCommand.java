@@ -2,16 +2,29 @@ package commands;
 
 import java.util.Map;
 
+import org.w3c.dom.Element;
+
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
+import edu.cmu.scs.fluorite.model.EventRecorder;
 
 public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 	// Unify analogous things with Eclipse Helper
+
+	public AnInsertCommand() {
+
+	}
+
 	private int index;
 	private String content;
 
 	public int getIndex() {
 		return index;
+	}
+
+	@Override
+	public void createFrom(Element commandElement) {
+		super.createFrom(commandElement);
 	}
 
 	public void setIndex(int newIndex) {
@@ -46,14 +59,12 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public String getCommandType() {
-		// TODO Auto-generated method stub
-		return null;
+		return "InsertCommand";
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Insert";
 	}
 
 	@Override
@@ -64,14 +75,12 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
-		return null;
+		return EventRecorder.MacroCommandCategory;
 	}
 
 	@Override
 	public String getCategoryID() {
-		// TODO Auto-generated method stub
-		return null;
+		return EventRecorder.MacroCommandCategoryID;
 	}
 
 	@Override

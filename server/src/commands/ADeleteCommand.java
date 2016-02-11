@@ -4,6 +4,7 @@ import java.util.Map;
 
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
+import edu.cmu.scs.fluorite.model.EventRecorder;
 
 public class ADeleteCommand extends AbstractCommand implements DeleteCommand {
 
@@ -46,14 +47,12 @@ public class ADeleteCommand extends AbstractCommand implements DeleteCommand {
 
 	@Override
 	public String getCommandType() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Delete Command";
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Delete";
 	}
 
 	@Override
@@ -64,14 +63,12 @@ public class ADeleteCommand extends AbstractCommand implements DeleteCommand {
 
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
-		return null;
+		return EventRecorder.MacroCommandCategory;
 	}
 
 	@Override
 	public String getCategoryID() {
-		// TODO Auto-generated method stub
-		return null;
+		return EventRecorder.MacroCommandCategoryID;
 	}
 
 	@Override
