@@ -1,0 +1,11 @@
+<Events startTimestamp="1455236200117" logVersion="0.5.3.qualifier">
+  <Command __id="103" _type="CutCommand" timestamp="17" />
+  <Command __id="105" _type="CutCommand" timestamp="18" />
+  <Command __id="107" _type="CutCommand" timestamp="19" />
+  <Command __id="109" _type="CutCommand" timestamp="19" />
+  <Command __id="111" _type="CutCommand" timestamp="22" />
+  <Command __id="113" _type="CutCommand" timestamp="23" />
+  <Command __id="115" _type="CutCommand" timestamp="24" />
+  <Command __id="117" _type="CutCommand" timestamp="28" />
+  <Command __id="119" _type="CutCommand" timestamp="31" />
+</Events>
