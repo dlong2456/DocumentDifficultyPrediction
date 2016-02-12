@@ -30,6 +30,7 @@ public class AMyJSONParser implements MyJSONParser {
 
 	public Object parse(String jsonString) {
 		JSONObject obj = new JSONObject(jsonString);
+		System.out.println(obj);
 		if (obj.has("type")) {
 			if (obj.get("type").equals("commandPercentage")) {
 				CommandPercentage commandPercentages = parseCommandPercentage(obj);
@@ -43,6 +44,7 @@ public class AMyJSONParser implements MyJSONParser {
 	}
 
 	private void parseCommand(JSONObject obj) {
+		System.out.println("parsing command");
 		JSONObject insertCommandObject;
 		JSONObject deleteCommandObject;
 		JSONObject styleCommandObject;

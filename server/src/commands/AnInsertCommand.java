@@ -2,6 +2,7 @@ package commands;
 
 import java.util.Map;
 
+import org.eclipse.ui.IEditorPart;
 import org.w3c.dom.Element;
 
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
@@ -85,6 +86,12 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public boolean combine(ICommand anotherCommand) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean execute(IEditorPart target) {
 		// TODO Auto-generated method stub
 		return false;
 	}

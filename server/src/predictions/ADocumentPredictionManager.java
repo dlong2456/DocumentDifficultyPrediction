@@ -1,5 +1,7 @@
 package predictions;
 
+import javax.swing.JFileChooser;
+
 import org.json.JSONObject;
 
 import config.FactorySingletonInitializer;
@@ -7,6 +9,7 @@ import difficultyPrediction.ADifficultyPredictionPluginEventProcessor;
 import difficultyPrediction.DifficultyPredictionSettings;
 import difficultyPrediction.DifficultyRobot;
 import edu.cmu.scs.fluorite.commands.ICommand;
+import edu.cmu.scs.fluorite.model.EventRecorder;
 import socket.WebSocketHandler;
 
 public class ADocumentPredictionManager implements DocumentPredictionManager {
@@ -18,12 +21,16 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		webSocketHandler = newWebSocketHandler;
 		DifficultyPredictionSettings.setReplayMode(true);
 		DifficultyPredictionSettings.setSegmentLength(5);
+//		JFileChooser fileChooser = new JFileChooser("C:\\Users\\Duri\\Documents");
 		FactorySingletonInitializer.configure();
+		EventRecorder.getInstance().initCommands();
 		DifficultyRobot.getInstance().addStatusListener(this);
 	}
 
 	public void processEvent(ICommand event) {
-		ADifficultyPredictionPluginEventProcessor.getInstance().newCommand(event);
+		System.out.println("sending event");
+		EventRecorder.getInstance().recordCommand(event);
+//		ADifficultyPredictionPluginEventProcessor.getInstance().newCommand(event);
 	}
 
 	@Override
@@ -40,6 +47,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	// currentStatus and sends the status to the client
 	@Override
 	public void newStatus(int aStatus) {
+		System.out.println("receiving status");
 		currentStatus = aStatus;
 		webSocketHandler.sendMessage("{ status: '" + currentStatus + "'}");
 	}

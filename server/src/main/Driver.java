@@ -5,7 +5,8 @@ import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import socket.AWebSocketHandler;
-
+//make it live mode at some point
+//make difficulty init happen only once
 public class Driver {
 
 	public static void main(String[] args) throws Exception {

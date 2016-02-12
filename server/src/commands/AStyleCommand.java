@@ -2,6 +2,8 @@ package commands;
 
 import java.util.Map;
 
+import org.eclipse.ui.IEditorPart;
+
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
@@ -82,6 +84,12 @@ public class AStyleCommand extends AbstractCommand implements StyleCommand {
 
 	@Override
 	public boolean combine(ICommand anotherCommand) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean execute(IEditorPart target) {
 		// TODO Auto-generated method stub
 		return false;
 	}
