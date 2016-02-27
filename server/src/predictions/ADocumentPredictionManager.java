@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import config.FactorySingletonInitializer;
 import difficultyPrediction.DifficultyPredictionSettings;
 import difficultyPrediction.DifficultyRobot;
-import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 import socket.WebSocketHandler;

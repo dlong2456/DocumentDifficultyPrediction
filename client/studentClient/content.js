@@ -261,7 +261,7 @@ function onScroll(event) {
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "scroll"}, function(response) {
 		});
 	}
-};
+}
 
 //generate a new version of onScroll using underscore.js's throttle function
 //throttle ensures that onScroll is only called once every 2000 milliseconds (2s) 

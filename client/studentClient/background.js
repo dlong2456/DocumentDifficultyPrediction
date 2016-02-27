@@ -60,14 +60,6 @@ ws.onerror = function(err) {
 function newCommand() {
   numberOfCommands++;
   if (numberOfCommands >= 10) {
-    var commandPercentageObject = {
-      type: "commandPercentage",
-      insertionPercentage : computeInsertPercentage(),
-      deletionPercentage : computeDeletePercentage(),
-      navigationPercentage : computeNavigationPercentage(),
-      stylePercentage : computeStylePercentage(),
-      debugPercentage : computeDebugPercentage()
-    };
     var commandObject = {
       type: "command",
       insertCommands : insertCommands,
@@ -78,7 +70,6 @@ function newCommand() {
       collaborationCommands: collaborationCommands
     };
     ws.send(JSON.stringify(commandObject));
-    ws.send(JSON.stringify(commandPercentageObject));
     numberOfCommands = 0;
     insertCommands = [];
     deleteCommands = [];
@@ -223,68 +214,3 @@ chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
   navigationCommands.push(navigationCommand);
   newCommand();
 });
-
-function computeInsertPercentage() {
-  var numberOfInsertEvents = insertCommands.length;
-  var numberOfNavigationEvents = navigationCommands.length;
-  var numberOfDeleteEvents = deleteCommands.length;
-  var numberOfStyleEvents = styleCommands.length;
-  var numberOfDebugEvents = spellcheckCommands.length + collaborationCommands.length;
-  var insertPercentage = 0;
-  if (numberOfInsertEvents > 0) {
-    insertPercentage = (numberOfInsertEvents/(numberOfNavigationEvents + numberOfDeleteEvents + numberOfInsertEvents + numberOfStyleEvents + numberOfDebugEvents)) * 100;
-  }
-  return insertPercentage;
-}
-
-function computeDeletePercentage() {
-  var numberOfInsertEvents = insertCommands.length;
-  var numberOfNavigationEvents = navigationCommands.length;
-  var numberOfDeleteEvents = deleteCommands.length;
-  var numberOfStyleEvents = styleCommands.length;
-  var numberOfDebugEvents = spellcheckCommands.length + collaborationCommands.length;
-  var deletePercentage = 0;
-  if (numberOfDeleteEvents > 0) {
-    deletePercentage = (numberOfDeleteEvents/(numberOfNavigationEvents + numberOfDeleteEvents + numberOfInsertEvents + numberOfStyleEvents + numberOfDebugEvents)) * 100;
-  }
-  return deletePercentage;
-}
-
-function computeNavigationPercentage() {
-  var numberOfInsertEvents = insertCommands.length;
-  var numberOfNavigationEvents = navigationCommands.length;
-  var numberOfDeleteEvents = deleteCommands.length;
-  var numberOfStyleEvents = styleCommands.length;
-  var numberOfDebugEvents = spellcheckCommands.length + collaborationCommands.length;
-  var navigationPercentage = 0;
-  if (numberOfNavigationEvents > 0) {
-    navigationPercentage = (numberOfNavigationEvents/(numberOfNavigationEvents + numberOfDeleteEvents + numberOfInsertEvents + numberOfStyleEvents + numberOfDebugEvents)) * 100;
-  }
-  return navigationPercentage;
-}
-
-function computeStylePercentage() {
-  var numberOfInsertEvents = insertCommands.length;
-  var numberOfNavigationEvents = navigationCommands.length;
-  var numberOfDeleteEvents = deleteCommands.length;
-  var numberOfStyleEvents = styleCommands.length;
-  var numberOfDebugEvents = spellcheckCommands.length + collaborationCommands.length;
-  var stylePercentage = 0;
-  if (numberOfStyleEvents > 0) {
-    stylePercentage = (numberOfStyleEvents/(numberOfNavigationEvents + numberOfDeleteEvents + numberOfInsertEvents + numberOfStyleEvents + numberOfDebugEvents)) * 100;
-  }
-  return stylePercentage;
-}
-
-function computeDebugPercentage() {
-  var numberOfInsertEvents = insertCommands.length;
-  var numberOfNavigationEvents = navigationCommands.length;
-  var numberOfDeleteEvents = deleteCommands.length;
-  var numberOfStyleEvents = styleCommands.length;
-  var numberOfDebugEvents = spellcheckCommands.length + collaborationCommands.length;
-  var debugPercentage = 0;
-  if (numberOfDebugEvents > 0) {
-    debugPercentage = (numberOfDebugEvents/(numberOfNavigationEvents + numberOfDeleteEvents + numberOfInsertEvents + numberOfStyleEvents + numberOfDebugEvents)) * 100;
-  }
-  return debugPercentage;
-}
