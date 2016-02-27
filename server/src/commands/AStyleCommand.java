@@ -58,7 +58,7 @@ public class AStyleCommand extends AbstractCommand implements StyleCommand {
 
 	@Override
 	public String getCommandType() {
-		return "StyleCommand";
+		return "DocumentStyleCommand";
 	}
 
 	@Override

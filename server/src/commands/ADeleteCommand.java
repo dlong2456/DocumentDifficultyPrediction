@@ -49,7 +49,7 @@ public class ADeleteCommand extends AbstractCommand implements DeleteCommand {
 
 	@Override
 	public String getCommandType() {
-		return "Delete Command";
+		return "DocumentDeleteCommand";
 	}
 
 	@Override

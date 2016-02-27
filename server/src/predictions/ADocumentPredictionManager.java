@@ -1,13 +1,11 @@
 package predictions;
 
-import javax.swing.JFileChooser;
-
 import org.json.JSONObject;
 
 import config.FactorySingletonInitializer;
-import difficultyPrediction.ADifficultyPredictionPluginEventProcessor;
 import difficultyPrediction.DifficultyPredictionSettings;
 import difficultyPrediction.DifficultyRobot;
+import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 import socket.WebSocketHandler;
@@ -17,11 +15,14 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	private static int currentStatus; // 1 for making progress, 0 for facing
 										// difficulty
 
+	public enum Status {
+		Making_Progress, Surmountable, Insurmountable
+	}
+
 	public ADocumentPredictionManager(WebSocketHandler newWebSocketHandler) {
 		webSocketHandler = newWebSocketHandler;
 		DifficultyPredictionSettings.setReplayMode(true);
 		DifficultyPredictionSettings.setSegmentLength(5);
-//		JFileChooser fileChooser = new JFileChooser("C:\\Users\\Duri\\Documents");
 		FactorySingletonInitializer.configure();
 		EventRecorder.getInstance().initCommands();
 		DifficultyRobot.getInstance().addStatusListener(this);
@@ -30,7 +31,6 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	public void processEvent(ICommand event) {
 		System.out.println("sending event");
 		EventRecorder.getInstance().recordCommand(event);
-//		ADifficultyPredictionPluginEventProcessor.getInstance().newCommand(event);
 	}
 
 	@Override
@@ -47,7 +47,6 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	// currentStatus and sends the status to the client
 	@Override
 	public void newStatus(int aStatus) {
-		System.out.println("receiving status");
 		currentStatus = aStatus;
 		webSocketHandler.sendMessage("{ status: '" + currentStatus + "'}");
 	}
@@ -57,6 +56,8 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		int newStatus = obj.getInt("makingProgress");
 		if (newStatus != currentStatus) {
 			currentStatus = newStatus;
+//			Status status = Making_Progress;
+//			ICommand statusCommand = new DifficulyStatusCommand(Making_Progress);
 			// TODO: Send to EclipseHelper, store the details and difficulty
 			// type.
 			// TODO: Update status in database and send update to teacher client

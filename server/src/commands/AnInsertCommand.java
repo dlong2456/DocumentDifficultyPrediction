@@ -60,7 +60,7 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public String getCommandType() {
-		return "InsertCommand";
+		return "DocumentInsertCommand";
 	}
 
 	@Override

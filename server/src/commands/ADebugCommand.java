@@ -40,7 +40,7 @@ public class ADebugCommand extends AbstractCommand implements DebugCommand {
 
 	@Override
 	public String getCommandType() {
-		return "DebugCommand";
+		return "DocumentDebugCommand";
 	}
 
 	@Override

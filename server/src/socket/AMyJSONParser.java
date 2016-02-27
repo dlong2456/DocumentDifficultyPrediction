@@ -58,9 +58,8 @@ public class AMyJSONParser implements MyJSONParser {
 			((ICommand) insertCommand).setTimestamp(insertCommandObject.getLong("timeStamp"));
 			insertCommand.setContent(insertCommandObject.getString("content"));
 			insertCommand.setIndex(insertCommandObject.getInt("index"));
-			// predictionManager.processEvent((ICommand) insertCommand);
-			ICommand cutCommand = new CutCommand();
-			predictionManager.processEvent(cutCommand);
+			 predictionManager.processEvent((ICommand) insertCommand);
+//			ICommand cutCommand = new CutCommand();
 		}
 		JSONArray deleteCommands = obj.getJSONArray("deleteCommands");
 		for (int i = 0; i < deleteCommands.length(); i++) {
@@ -69,9 +68,9 @@ public class AMyJSONParser implements MyJSONParser {
 			((ICommand) deleteCommand).setTimestamp(deleteCommandObject.getLong("timeStamp"));
 			deleteCommand.setEndIndex(deleteCommandObject.getInt("endIndex"));
 			deleteCommand.setStartIndex(deleteCommandObject.getInt("startIndex"));
-			// predictionManager.processEvent((ICommand) deleteCommand);
-			ICommand runCommand = new RunCommand();
-			predictionManager.processEvent(runCommand);
+			predictionManager.processEvent((ICommand) deleteCommand);
+//			ICommand runCommand = new RunCommand();
+//			predictionManager.processEvent(runCommand);
 		}
 		// TODO: Bug with parsing style commands. "not a JSON object"
 		JSONArray styleCommands = obj.getJSONArray("styleCommands");
@@ -83,18 +82,18 @@ public class AMyJSONParser implements MyJSONParser {
 			styleCommand.setEndIndex(styleCommandObject.getInt("endIndex"));
 			styleCommand.setStartIndex(styleCommandObject.getInt("startIndex"));
 			styleCommand.setType(styleCommandObject.getString("type"));
-			ICommand selectTextCommand = new SelectTextCommand();
-			predictionManager.processEvent(selectTextCommand);
-			// predictionManager.processEvent((ICommand) styleCommand);
+//			ICommand selectTextCommand = new SelectTextCommand();
+//			predictionManager.processEvent(selectTextCommand);
+			predictionManager.processEvent((ICommand) styleCommand);
 		}
 		JSONArray navigationCommands = obj.getJSONArray("navigationCommands");
 		for (int i = 0; i < navigationCommands.length(); i++) {
 			ICommand navigationCommand = new ANavigationCommand();
 			navigationCommandObject = navigationCommands.getJSONObject(i);
 			navigationCommand.setTimestamp(navigationCommandObject.getLong("timeStamp"));
-			// predictionManager.processEvent(navigationCommand);
-			ICommand cutCommand = new CutCommand();
-			predictionManager.processEvent(cutCommand);
+			predictionManager.processEvent(navigationCommand);
+//			ICommand cutCommand = new CutCommand();
+//			predictionManager.processEvent(cutCommand);
 		}
 		JSONArray spellcheckCommands = obj.getJSONArray("spellcheckCommands");
 		for (int i = 0; i < spellcheckCommands.length(); i++) {
@@ -102,7 +101,7 @@ public class AMyJSONParser implements MyJSONParser {
 			spellcheckCommandObject = spellcheckCommands.getJSONObject(i);
 			((ICommand) debugCommand).setTimestamp(spellcheckCommandObject.getLong("timeStamp"));
 			debugCommand.setType(spellcheckCommandObject.getString("type"));
-			// predictionManager.processEvent((ICommand) debugCommand);
+			 predictionManager.processEvent((ICommand) debugCommand);
 		}
 		JSONArray collaborationCommands = obj.getJSONArray("collaborationCommands");
 		for (int i = 0; i < collaborationCommands.length(); i++) {
@@ -110,7 +109,7 @@ public class AMyJSONParser implements MyJSONParser {
 			collaborationCommandObject = collaborationCommands.getJSONObject(i);
 			((ICommand) debugCommand).setTimestamp(collaborationCommandObject.getLong("timeStamp"));
 			debugCommand.setType("collaborationCommand");
-			// predictionManager.processEvent((ICommand) debugCommand);
+			predictionManager.processEvent((ICommand) debugCommand);
 		}
 	}
 

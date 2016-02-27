@@ -38,7 +38,7 @@ public class ANavigationCommand extends AbstractCommand {
 
 	@Override
 	public String getCommandType() {
-		return "NavigationCommand";
+		return "DocumentFocusCommand";
 	}
 
 	@Override

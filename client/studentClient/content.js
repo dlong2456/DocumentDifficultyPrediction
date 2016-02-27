@@ -252,11 +252,6 @@ document.addEventListener("click",
 
 //****PAGE SCROLL AND MOUSEOVER LISTENERS****//
 
-// document.getElementById().addEventListener("click", 
-// 	function(event) {
-
-// 	});
-
 window.addEventListener('scroll', 
 	function(){ 
 		console.log("SCROLL");
@@ -265,10 +260,18 @@ window.addEventListener('scroll',
 	}, true
 );
 
-//This works -- how many mouse moves do I actually want to listen to?  
-document.addEventListener("mousemove", function(event) {
-	//log mouse move events
-});
+//This can listen to mouse moves. Disabled for now. 
+// document.addEventListener("mousemove", function(event) {
+// 	//log mouse move events
+// });
+
+//This can listen to keypresses. Disabled for now.
+// window.addEventListener("keypress", function(event) {
+// 	var charCode = (typeof event.which == "number") ? event.which : event.keyCode;
+//     if (charCode > 0) {
+//     	console.log("KEYPRESS: " + String.fromCharCode(charCode));
+//     }
+// });
 
 //***MESSAGE HANDLING CODE***//
 
