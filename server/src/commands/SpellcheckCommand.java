@@ -3,46 +3,17 @@ package commands;
 import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
-import org.w3c.dom.Element;
 
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
-public class AnInsertCommand extends AbstractCommand implements InsertCommand {
-
-	public AnInsertCommand() {
-
-	}
-
-	private int index;
-	private String content;
-
-	public int getIndex() {
-		return index;
-	}
-
-	@Override
-	public void createFrom(Element commandElement) {
-		super.createFrom(commandElement);
-	}
-
-	public void setIndex(int newIndex) {
-		index = newIndex;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String newContent) {
-		content = newContent;
-	}
+public class SpellcheckCommand extends AbstractCommand {
 
 	@Override
 	public void dump() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
@@ -59,12 +30,12 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public String getCommandType() {
-		return "DocumentInsertCommand";
+		return "DocumentSpellcheckCommand";
 	}
 
 	@Override
 	public String getName() {
-		return "Insert";
+		return "Spellcheck";
 	}
 
 	@Override
@@ -94,4 +65,5 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 }

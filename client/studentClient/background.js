@@ -1,7 +1,13 @@
 var insertCommands = [];
 var deleteCommands = [];
-var styleCommands = [];
-var navigationCommands = [];
+var boldCommands = [];
+var italicizeCommands = [];
+var highlightCommands = [];
+var underlineCommands = [];
+var scrollCommands = [];
+var createNewTabCommands = [];
+var switchTabCommands = [];
+var updateURLCommands  = [];
 var spellcheckCommands = [];
 var collaborationCommands = [];
 var numberOfCommands = 0;
@@ -23,16 +29,21 @@ chrome.runtime.onMessage.addListener(function(request) {
     var spellcheckCommand = new SpellcheckCommand(request.timestamp, request.type);
     spellcheckCommands.push(spellcheckCommand);
     newCommand();
-  }
-  if (request.type === "statusUpdate") {
-    var statusUpdateObject = {
-      type: "statusUpdate",
-      makingProgress: request.makingProgress,
-      difficultyType: request.difficultyType,
-      details: request.details
-    }
-    ws.send(JSON.stringify(statusUpdateObject));
-  }
+  //Status updates
+  } else if (request.type === "statusUpdate") {
+      var statusUpdateObject = {
+        type: "statusUpdate",
+        makingProgress: request.makingProgress,
+        difficultyType: request.difficultyType,
+        details: request.details
+      };
+      ws.send(JSON.stringify(statusUpdateObject));
+  //Scroll commands
+  } else if (request.type === "scroll") {
+      var scrollCommand = new ScrollCommand(request.timestamp);
+      scrollCommands.push(scrollCommand);
+      newCommand();
+  } 
 });
 
 //Web socket functionality
@@ -64,10 +75,16 @@ function newCommand() {
       type: "command",
       insertCommands : insertCommands,
       deleteCommands : deleteCommands,
-      styleCommands : styleCommands,
-      navigationCommands : navigationCommands,
+      boldCommands : boldCommands,
+      scrollCommands : scrollCommands,
       spellcheckCommands: spellcheckCommands,
-      collaborationCommands: collaborationCommands
+      collaborationCommands: collaborationCommands, 
+      italicizeCommands : italicizeCommands, 
+      highlightCommands : highlightCommands, 
+      underlineCommands : underlineCommands, 
+      updateURLCommands : updateURLCommands, 
+      createNewTabCommands : createNewTabCommands,
+      switchTabCommands : switchTabCommands
     };
     ws.send(JSON.stringify(commandObject));
     numberOfCommands = 0;
@@ -131,8 +148,20 @@ var StyleCommand = function (timestamp, startIndex, endIndex, type) {
   this.type = type;
 };
 
-var NavigationCommand = function(timestamp) {
-  this.timeStamp = timestamp;
+var ScrollCommand = function(timeStamp) {
+  this.timeStamp = timeStamp;
+};
+
+var CreateNewTabCommand = function(timeStamp) {
+  this.timeStamp = timeStamp;
+};
+
+var UpdateURLCommand = function(timeStamp) {
+  this.timeStamp = timeStamp;
+};
+
+var SwitchTabCommand = function(timeStamp) {
+  this.timeStamp = timeStamp;
 };
 
 function parseData(data) {
@@ -171,46 +200,49 @@ function processCommands(command, timeStamp) {
     var styleCommand;
     if(command.sm.hasOwnProperty('ts_bd_i')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'bold');
+      boldCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_it_i')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'italics');
+      boldCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_un_i')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'underline');
+      underlineCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_bgc_i')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'highlight');
       styleCommand.highlightColor = command.ts_bgc;
+      highlightCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_fgc_i')) {
-      styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'font color change');
-      styleCommand.fontColor = command.ts_fgc;
+      //TODO: handle this and send to server
+      // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'font color change');
+      // styleCommand.fontColor = command.ts_fgc;
     }
     //etc.
     if (styleCommand) {
-      styleCommands.push(styleCommand);
       newCommand();
     }
   }
 }
 
-
 //on typing new URL in a tab or reloading page
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   var url = tab.url;
   if (url !== undefined && changeInfo.status == "complete") {
-    var navigationCommand = new NavigationCommand(Date.now());
-    navigationCommands.push(navigationCommand);
+    var updateURLCommand = new UpdateURLCommand(Date.now());
+    updateURLCommands.push(updateURLCommand);
     newCommand();
   }
 });
 
 //on switching tabs
 chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
-  var navigationCommand = new NavigationCommand(Date.now());
-  navigationCommands.push(navigationCommand);
+  var switchTabCommand = new SwitchTabCommand(Date.now());
+  switchTabCommands.push(switchTabCommand);
   newCommand();
 });
 
 //on creating a tab (calls update and activate also)
 chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
-  var navigationCommand = new NavigationCommand(Date.now());
-  navigationCommands.push(navigationCommand);
+  var createNewTabCommand = new CreateNewTabCommand(Date.now());
+  createNewTabCommands.push(createNewTabCommand);
   newCommand();
 });

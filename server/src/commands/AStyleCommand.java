@@ -8,11 +8,10 @@ import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
-public class AStyleCommand extends AbstractCommand implements StyleCommand {
+public abstract class AStyleCommand extends AbstractCommand implements StyleCommand {
 
 	private int startIndex;
 	private int endIndex;
-	private String type;
 
 	public int getStartIndex() {
 		return startIndex;
@@ -30,18 +29,10 @@ public class AStyleCommand extends AbstractCommand implements StyleCommand {
 		endIndex = newEndIndex;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String newType) {
-		type = newType;
-	}
-
 	@Override
 	public void dump() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -54,16 +45,6 @@ public class AStyleCommand extends AbstractCommand implements StyleCommand {
 	public Map<String, String> getDataMap() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public String getCommandType() {
-		return "DocumentStyleCommand";
-	}
-
-	@Override
-	public String getName() {
-		return "Style";
 	}
 
 	@Override

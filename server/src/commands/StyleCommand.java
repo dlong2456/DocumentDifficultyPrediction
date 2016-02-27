@@ -10,8 +10,4 @@ public interface StyleCommand {
 
 	public void setEndIndex(int newEndIndex);
 
-	public String getType();
-
-	public void setType(String newType);
-
 }

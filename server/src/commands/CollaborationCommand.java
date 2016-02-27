@@ -4,19 +4,11 @@ import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
 
-
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
-public class ANavigationCommand extends AbstractCommand {
-
-	private long timestamp;
-
-	@Override
-	public void setTimestamp(long newTimestamp) {
-		timestamp = newTimestamp;
-	}
+public class CollaborationCommand extends AbstractCommand {
 
 	@Override
 	public void dump() {
@@ -38,12 +30,12 @@ public class ANavigationCommand extends AbstractCommand {
 
 	@Override
 	public String getCommandType() {
-		return "DocumentFocusCommand";
+		return "DocumentCollaborationCommand";
 	}
 
 	@Override
 	public String getName() {
-		return "Navigation";
+		return "Collaboration";
 	}
 
 	@Override
@@ -60,11 +52,6 @@ public class ANavigationCommand extends AbstractCommand {
 	@Override
 	public String getCategoryID() {
 		return EventRecorder.MacroCommandCategoryID;
-	}
-
-	@Override
-	public long getTimestamp() {
-		return timestamp;
 	}
 
 	@Override

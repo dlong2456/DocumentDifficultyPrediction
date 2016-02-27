@@ -8,22 +8,19 @@ import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
-public class ADebugCommand extends AbstractCommand implements DebugCommand {
+public class UpdateURLCommand extends AbstractCommand {
 
-	private String type;
+	private long timestamp;
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String newType) {
-		type = newType;
+	@Override
+	public void setTimestamp(long newTimestamp) {
+		timestamp = newTimestamp;
 	}
 
 	@Override
 	public void dump() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -40,12 +37,12 @@ public class ADebugCommand extends AbstractCommand implements DebugCommand {
 
 	@Override
 	public String getCommandType() {
-		return "DocumentDebugCommand";
+		return "DocumentUpdateURLCommand";
 	}
 
 	@Override
 	public String getName() {
-		return "Debug";
+		return "UpdateURL";
 	}
 
 	@Override
@@ -62,6 +59,11 @@ public class ADebugCommand extends AbstractCommand implements DebugCommand {
 	@Override
 	public String getCategoryID() {
 		return EventRecorder.MacroCommandCategoryID;
+	}
+
+	@Override
+	public long getTimestamp() {
+		return timestamp;
 	}
 
 	@Override

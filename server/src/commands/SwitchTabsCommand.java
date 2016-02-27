@@ -3,40 +3,18 @@ package commands;
 import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
-import org.w3c.dom.Element;
 
 import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
-public class AnInsertCommand extends AbstractCommand implements InsertCommand {
+public class SwitchTabsCommand extends AbstractCommand {
 
-	public AnInsertCommand() {
-
-	}
-
-	private int index;
-	private String content;
-
-	public int getIndex() {
-		return index;
-	}
+	private long timestamp;
 
 	@Override
-	public void createFrom(Element commandElement) {
-		super.createFrom(commandElement);
-	}
-
-	public void setIndex(int newIndex) {
-		index = newIndex;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String newContent) {
-		content = newContent;
+	public void setTimestamp(long newTimestamp) {
+		timestamp = newTimestamp;
 	}
 
 	@Override
@@ -59,12 +37,12 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public String getCommandType() {
-		return "DocumentInsertCommand";
+		return "DocumentSwitchTabsCommand";
 	}
 
 	@Override
 	public String getName() {
-		return "Insert";
+		return "SwitchTabs";
 	}
 
 	@Override
@@ -84,6 +62,11 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 	}
 
 	@Override
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	@Override
 	public boolean combine(ICommand anotherCommand) {
 		// TODO Auto-generated method stub
 		return false;
@@ -94,4 +77,5 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 }
