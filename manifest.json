@@ -19,7 +19,7 @@
     "matches": [
         "<all_urls>"
     ],
-    "js": ["client/thirdParty/jquery-2.1.4.min.js", "client/studentClient/content.js"], 
+    "js": ["client/thirdParty/jquery-2.1.4.min.js", "node_modules/underscore/underscore-min.js", "node_modules/underscore/underscore.js", "client/studentClient/content.js"], 
     "html": ["client/studentClient/dialog.html"], 
     "css": ["client/studentClient/custom.css"]
   }

@@ -14,8 +14,7 @@ $progress_button.prependTo($('.docs-titlebar-buttons'));
 $progress_button.addClass('jfk-button-clear-outline');
 
 //Set difficulty status and create status display
-//TODO: Set this variable using data from backend
-var statusText = 'No status yet'; //either 'Progress' or 'Slow progress'
+var statusText = 'No status yet'; //either 'No status yet', Progress' or 'Slow progress'. Backend will change it based on status.
 var $status = $('<div id="status" class="goog-inline-block" aria-label="Difficulty status" style="-webkit-user-select: none;" tabindex="0"><span id="status-text" style = "color: #458B00">' + statusText + '</span>&nbsp;&nbsp;&nbsp;&nbsp;</div>');
 $status.prependTo($('.docs-titlebar-buttons'));
 
@@ -238,34 +237,49 @@ $('#content').mouseleave(function() {
 document.addEventListener("click",
   function(event) {
 	if (event.target.getAttribute('id') === "docs-spellcheckslidingdialog-button-change") {
+		//send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spellcheck_change"}, function(response) {
 		});
 	} else if (event.target.getAttribute('id') === "docs-spellcheckslidingdialog-button-dictionary") {
+		//send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spellcheck_dictionary"}, function(response) {
 		});
 	} else if (event.target.getAttribute('id') === "docs-spellcheckslidingdialog-button-ignore") {
+		//send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spellcheck_ignore"}, function(response) {
 		});
 	}
   }
 );
 
-//****PAGE SCROLL AND MOUSEOVER LISTENERS****//
+//****PAGE SCROLL AND OTHER LISTENERS****//
 
-window.addEventListener('scroll', 
-	function(){ 
-		console.log("SCROLL");
-		//how often should I send these?
-		//how to get current page number?
-	}, true
-);
+//function that is called on scroll events
+function onScroll(event) {
+	if (event.srcElement.attributes[0].nodeValue === "kix-appview-editor") {
+		//send message to background.js
+		chrome.runtime.sendMessage({timestamp: Date.now(), type: "scroll"}, function(response) {
+		});
+	}
+};
 
-//This can listen to mouse moves. Disabled for now. 
+//generate a new version of onScroll using underscore.js's throttle function
+//throttle ensures that onScroll is only called once every 2000 milliseconds (2s) 
+//ordinarily, scroll events fire really rapidly in succession and we don't want them to skew the command aggregation
+//for more documentation, see underscorejs.org
+var throttled = _.throttle(onScroll, 2000, {trailing: false});
+
+//attach the new "throttled" function to the scroll event listener 
+window.addEventListener('scroll', throttled, true);
+
+//---Code below can listen to mouse moves. Disabled for now.--- 
+
 // document.addEventListener("mousemove", function(event) {
 // 	//log mouse move events
 // });
 
-//This can listen to keypresses. Disabled for now.
+//----Code below can listen to keypresses. Disabled for now.---
+
 // window.addEventListener("keypress", function(event) {
 // 	var charCode = (typeof event.which == "number") ? event.which : event.keyCode;
 //     if (charCode > 0) {
@@ -275,7 +289,7 @@ window.addEventListener('scroll',
 
 //***MESSAGE HANDLING CODE***//
 
-//receive messages from backend.js
+//receive messages from background.js
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		if (request.message === '0') {
