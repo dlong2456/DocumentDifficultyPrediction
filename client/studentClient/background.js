@@ -78,11 +78,11 @@ function newCommand() {
       boldCommands : boldCommands,
       scrollCommands : scrollCommands,
       spellcheckCommands: spellcheckCommands,
-      collaborationCommands: collaborationCommands, 
-      italicizeCommands : italicizeCommands, 
-      highlightCommands : highlightCommands, 
-      underlineCommands : underlineCommands, 
-      updateURLCommands : updateURLCommands, 
+      collaborationCommands: collaborationCommands,
+      italicizeCommands : italicizeCommands,
+      highlightCommands : highlightCommands,
+      underlineCommands : underlineCommands,
+      updateURLCommands : updateURLCommands,
       createNewTabCommands : createNewTabCommands,
       switchTabCommands : switchTabCommands
     };
@@ -90,10 +90,16 @@ function newCommand() {
     numberOfCommands = 0;
     insertCommands = [];
     deleteCommands = [];
-    styleCommands = [];
-    navigationCommands = [];
-    collaborationCommands = [];
+    boldCommands = [];
+    scrollCommands = [];
     spellcheckCommands = [];
+    collaborationCommands = []; 
+    italicizeCommands = [];
+    highlightCommands = [];
+    underlineCommands = [];
+    updateURLCommands = [];
+    createNewTabCommands = [];
+    switchTabCommands = [];
   }
 }
 
@@ -110,6 +116,7 @@ chrome.webRequest.onBeforeRequest.addListener(
         parseData(data);
       } else if (request.url.indexOf('/sync?') != -1) {
         //this is a suggested revision or a comment
+        console.log("CollaborationCommand");
         var collaborationCommand = new CollaborationCommand(Date.now());
         collaborationCommands.push(collaborationCommand);
         newCommand();
@@ -203,7 +210,7 @@ function processCommands(command, timeStamp) {
       boldCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_it_i')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'italics');
-      boldCommands.push(styleCommand);
+      italicizeCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_un_i')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'underline');
       underlineCommands.push(styleCommand);
@@ -223,10 +230,9 @@ function processCommands(command, timeStamp) {
   }
 }
 
-//on typing new URL in a tab or reloading page
+//function called on typing new URL in a tab 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  var url = tab.url;
-  if (url !== undefined && changeInfo.status == "complete") {
+  if (changeInfo.url !== undefined) { //if statement prevents it from firing on refresh or iframe load
     var updateURLCommand = new UpdateURLCommand(Date.now());
     updateURLCommands.push(updateURLCommand);
     newCommand();

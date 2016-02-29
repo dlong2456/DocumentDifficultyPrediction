@@ -19,15 +19,14 @@ import commands.SwitchTabsCommand;
 import commands.UnderlineCommand;
 import commands.UpdateURLCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
-import predictions.ADocumentPredictionManager;
 import predictions.DocumentPredictionManager;
 
 public class AMyJSONParser implements MyJSONParser {
 
 	private DocumentPredictionManager predictionManager;
 
-	public AMyJSONParser(WebSocketHandler webSocketHandler) {
-		predictionManager = new ADocumentPredictionManager(webSocketHandler);
+	public AMyJSONParser(DocumentPredictionManager newPredictionManager) {
+		predictionManager = newPredictionManager;
 	}
 
 	public Object parse(String jsonString) {
@@ -93,7 +92,7 @@ public class AMyJSONParser implements MyJSONParser {
 			predictionManager.processEvent((ICommand) underlineCommand);
 		}
 		JSONArray italicizeCommands = obj.getJSONArray("italicizeCommands");
-		for (int i = 0; i < underlineCommands.length(); i++) {
+		for (int i = 0; i < italicizeCommands.length(); i++) {
 			StyleCommand italicizeCommand = new ItalicizeCommand();
 			italicizeCommandObject = italicizeCommands.getJSONObject(i);
 			((ICommand) italicizeCommand).setTimestamp(italicizeCommandObject.getLong("timeStamp"));

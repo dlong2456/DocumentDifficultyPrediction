@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="/Users/Duri/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EclipseHelper"/>
 	<classpathentry kind="lib" path="lib/eclipse-workbench-2.1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/Duri/Grader/oeall-22.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

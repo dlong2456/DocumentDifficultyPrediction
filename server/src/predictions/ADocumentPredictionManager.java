@@ -3,8 +3,10 @@ package predictions;
 import org.json.JSONObject;
 
 import config.FactorySingletonInitializer;
+import difficultyPrediction.APredictionParameters;
 import difficultyPrediction.DifficultyPredictionSettings;
 import difficultyPrediction.DifficultyRobot;
+import difficultyPrediction.metrics.CommandClassificationSchemeName;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 import socket.WebSocketHandler;
@@ -20,6 +22,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 
 	public ADocumentPredictionManager(WebSocketHandler newWebSocketHandler) {
 		webSocketHandler = newWebSocketHandler;
+		APredictionParameters.getInstance().setCommandClassificationScheme(CommandClassificationSchemeName.A4);
 		DifficultyPredictionSettings.setReplayMode(true);
 		DifficultyPredictionSettings.setSegmentLength(5);
 		FactorySingletonInitializer.configure();
@@ -28,7 +31,6 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	}
 
 	public void processEvent(ICommand event) {
-		System.out.println("sending event");
 		EventRecorder.getInstance().recordCommand(event);
 	}
 
@@ -51,12 +53,12 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	}
 
 	public void handleStatusUpdate(JSONObject obj) {
-		System.out.println("Status update: " + obj);
 		int newStatus = obj.getInt("makingProgress");
 		if (newStatus != currentStatus) {
 			currentStatus = newStatus;
-//			Status status = Making_Progress;
-//			ICommand statusCommand = new DifficulyStatusCommand(Making_Progress);
+			// Status status = Making_Progress;
+			// ICommand statusCommand = new
+			// DifficulyStatusCommand(Making_Progress);
 			// TODO: Send to EclipseHelper, store the details and difficulty
 			// type.
 			// TODO: Update status in database and send update to teacher client
@@ -81,6 +83,12 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 
 	public void setStatus(int newStatus) {
 		currentStatus = newStatus;
+	}
+
+	@Override
+	public void newReplayedStatus(int aStatus) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

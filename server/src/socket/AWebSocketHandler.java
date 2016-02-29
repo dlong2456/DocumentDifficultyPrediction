@@ -9,11 +9,15 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+import predictions.ADocumentPredictionManager;
+import predictions.DocumentPredictionManager;
+//TODO: New websocket on every connection, meaning that the old documentpredictionmanager calls sendMessage in old (closed) version of the websocket. 
 @WebSocket
 public class AWebSocketHandler implements WebSocketHandler {
 	// List of all current clients being serviced by the handler
 	// private Set<WebSocketHandler> clients = new Set<WebSocketHandler>();
 	private Session session;
+	private DocumentPredictionManager predictionManager;
 
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason) {
@@ -30,7 +34,11 @@ public class AWebSocketHandler implements WebSocketHandler {
 	public void onConnect(Session session) {
 		this.session = session;
 		// clients.add(this);
+		System.out.println("This: " + this);
+		System.out.println("Session: " + this.session);
+		System.out.println("Remote: " + getSession().getRemote());
 		System.out.println("Connect: " + session.getRemoteAddress().getAddress());
+		predictionManager = new ADocumentPredictionManager(this);
 	}
 
 	// receives messages from the client(s)
@@ -39,7 +47,7 @@ public class AWebSocketHandler implements WebSocketHandler {
 		if (message.equals("Message Received")) { // Message from teacher client
 
 		} else { // Message from student client
-			MyJSONParser jsonParser = new AMyJSONParser(this);
+			MyJSONParser jsonParser = new AMyJSONParser(predictionManager);
 			jsonParser.parse(message);
 		}
 
