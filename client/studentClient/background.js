@@ -7,10 +7,14 @@ var underlineCommands = [];
 var scrollCommands = [];
 var createNewTabCommands = [];
 var switchTabCommands = [];
+var windowFocusCommands = [];
 var updateURLCommands  = [];
 var spellcheckCommands = [];
 var collaborationCommands = [];
 var numberOfCommands = 0;
+var chromeInFocus = 1;
+var documentId;
+var documentIdFound = 0;
 
 //MESSAGE PASSING
 
@@ -43,11 +47,12 @@ chrome.runtime.onMessage.addListener(function(request) {
       var scrollCommand = new ScrollCommand(request.timestamp);
       scrollCommands.push(scrollCommand);
       newCommand();
-  } 
+  }
 });
 
 //Web socket functionality
 var ws = new WebSocket("ws://127.0.0.1:8080/");
+// var ws = new WebSocket("ws://classroom1.cs.unc.edu:5050/");
 
 ws.onopen = function() {
 };
@@ -84,7 +89,8 @@ function newCommand() {
       underlineCommands : underlineCommands,
       updateURLCommands : updateURLCommands,
       createNewTabCommands : createNewTabCommands,
-      switchTabCommands : switchTabCommands
+      switchTabCommands : switchTabCommands,
+      windowFocusCommands: windowFocusCommands
     };
     ws.send(JSON.stringify(commandObject));
     numberOfCommands = 0;
@@ -93,13 +99,14 @@ function newCommand() {
     boldCommands = [];
     scrollCommands = [];
     spellcheckCommands = [];
-    collaborationCommands = []; 
+    collaborationCommands = [];
     italicizeCommands = [];
     highlightCommands = [];
     underlineCommands = [];
     updateURLCommands = [];
     createNewTabCommands = [];
     switchTabCommands = [];
+    windowFocusCommands = [];
   }
 }
 
@@ -143,6 +150,7 @@ var DeleteCommand = function (timestamp, startIndex, endIndex) {
 };
 
 var InsertCommand = function (timestamp, index, content) {
+  // console.log(timestamp);
   this.timeStamp = timestamp;
   this.index = index;
   this.content = content;
@@ -168,6 +176,10 @@ var UpdateURLCommand = function(timeStamp) {
 };
 
 var SwitchTabCommand = function(timeStamp) {
+  this.timeStamp = timeStamp;
+};
+
+var WindowFocusCommand = function(timeStamp) {
   this.timeStamp = timeStamp;
 };
 
@@ -233,6 +245,9 @@ function processCommands(command, timeStamp) {
 //function called on typing new URL in a tab 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo.url !== undefined) { //if statement prevents it from firing on refresh or iframe load
+    if(documentIdFound === 0) {
+      checkURL();
+    }
     var updateURLCommand = new UpdateURLCommand(Date.now());
     updateURLCommands.push(updateURLCommand);
     newCommand();
@@ -241,6 +256,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
 //on switching tabs
 chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
+  if(documentIdFound === 0) {
+    checkURL();
+  }
   var switchTabCommand = new SwitchTabCommand(Date.now());
   switchTabCommands.push(switchTabCommand);
   newCommand();
@@ -248,7 +266,42 @@ chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
 
 //on creating a tab (calls update and activate also)
 chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
+  if(documentIdFound === 0) {
+    checkURL();
+  }
   var createNewTabCommand = new CreateNewTabCommand(Date.now());
   createNewTabCommands.push(createNewTabCommand);
   newCommand();
 });
+
+//Detects when the user is on a Google Docs tab.
+function checkURL() {
+  chrome.tabs.getSelected(null, function(tab) {
+    if(/^(https:\/\/docs\.google\.com)/.test(tab.url)) {
+      var match = tab.url.match(/^(https:\/\/docs\.google\.com\/document\/d\/(.*?)\/edit)/);
+      documentId = match[2];
+      var docIdObject = {
+        type: "documentId",
+        documentId: documentId
+      };
+      ws.send(JSON.stringify(docIdObject));
+      //TODO: Send ID to server
+      //Set this so we don't have to keep polling now that we have found the ID
+      documentIdFound = 1;
+    }
+  });
+}
+
+//to tell when Chrome loses focus
+window.setInterval(checkBrowserFocus, 1000);
+function checkBrowserFocus() {
+  chrome.windows.getCurrent(function(browser) {
+    //only log an event when a change in focus occurs
+    if (browser.focused != chromeInFocus) {
+      chromeInFocus = browser.focused;
+      var windowFocusCommand = new WindowFocusCommand(Date.now());
+      windowFocusCommands.push(windowFocusCommand);
+      newCommand();
+    }
+  });
+}

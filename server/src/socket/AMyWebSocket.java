@@ -1,6 +1,8 @@
 package socket;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -11,17 +13,16 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import predictions.ADocumentPredictionManager;
 import predictions.DocumentPredictionManager;
-//TODO: New websocket on every connection, meaning that the old documentpredictionmanager calls sendMessage in old (closed) version of the websocket. 
+
 @WebSocket
-public class AWebSocketHandler implements WebSocketHandler {
-	// List of all current clients being serviced by the handler
-	// private Set<WebSocketHandler> clients = new Set<WebSocketHandler>();
+public class AMyWebSocket implements MyWebSocket {
 	private Session session;
 	private DocumentPredictionManager predictionManager;
 
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason) {
-		// clients.remove(this);
+		SocketManager.getInstance().part(this);
+		//stop EventRecorder
 		System.out.println("Close: statusCode=" + statusCode + ", reason=" + reason);
 	}
 
@@ -33,7 +34,7 @@ public class AWebSocketHandler implements WebSocketHandler {
 	@OnWebSocketConnect
 	public void onConnect(Session session) {
 		this.session = session;
-		// clients.add(this);
+		SocketManager.getInstance().join(this);
 		System.out.println("This: " + this);
 		System.out.println("Session: " + this.session);
 		System.out.println("Remote: " + getSession().getRemote());

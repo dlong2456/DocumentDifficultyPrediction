@@ -6,7 +6,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 
-public interface WebSocketHandler {
+public interface MyWebSocket {
 
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason);

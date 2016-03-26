@@ -4,11 +4,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import commands.ADeleteCommand;
+import commands.ADocumentIdCommand;
+import commands.ALargeDeleteCommand;
+import commands.ALargeInsertCommand;
+import commands.AWindowFocusCommand;
 import commands.AnInsertCommand;
 import commands.BoldCommand;
 import commands.CollaborationCommand;
 import commands.CreateNewTabCommand;
 import commands.DeleteCommand;
+import commands.DocumentIdCommand;
 import commands.HighlightCommand;
 import commands.InsertCommand;
 import commands.ItalicizeCommand;
@@ -31,12 +36,15 @@ public class AMyJSONParser implements MyJSONParser {
 
 	public Object parse(String jsonString) {
 		JSONObject obj = new JSONObject(jsonString);
-		System.out.println(obj);
 		if (obj.has("type")) {
 			if (obj.get("type").equals("command")) {
 				parseCommand(obj);
 			} else if (obj.get("type").equals("statusUpdate")) {
 				predictionManager.handleStatusUpdate(obj);
+			} else if (obj.get("type").equals("documentId")) {
+				DocumentIdCommand idCommand = new ADocumentIdCommand();
+				idCommand.setDocumentId(obj.getString("documentId"));
+				predictionManager.processEvent((ICommand) idCommand);
 			}
 		}
 		return obj;
@@ -55,23 +63,46 @@ public class AMyJSONParser implements MyJSONParser {
 		JSONObject updateURLCommandObject;
 		JSONObject spellcheckCommandObject;
 		JSONObject collaborationCommandObject;
+		JSONObject windowFocusCommandObject;
 		JSONArray insertCommands = obj.getJSONArray("insertCommands");
 		for (int i = 0; i < insertCommands.length(); i++) {
-			InsertCommand insertCommand = new AnInsertCommand();
 			insertCommandObject = insertCommands.getJSONObject(i);
-			((ICommand) insertCommand).setTimestamp(insertCommandObject.getLong("timeStamp"));
-			insertCommand.setContent(insertCommandObject.getString("content"));
-			insertCommand.setIndex(insertCommandObject.getInt("index"));
-			predictionManager.processEvent((ICommand) insertCommand);
+			// if more than 100 characters are being inserted, assume this is a
+			// large insert command
+			if (insertCommandObject.getString("content").length() > 100) {
+				InsertCommand largeInsertCommand = new ALargeInsertCommand();
+				((ICommand) largeInsertCommand).setTimestamp(insertCommandObject.getLong("timeStamp"));
+				largeInsertCommand.setContent(insertCommandObject.getString("content"));
+				largeInsertCommand.setIndex(insertCommandObject.getInt("index"));
+				predictionManager.processEvent((ICommand) largeInsertCommand);
+				// otherwise, it is a regular insert command
+			} else {
+				InsertCommand insertCommand = new AnInsertCommand();
+				((ICommand) insertCommand).setTimestamp(insertCommandObject.getLong("timeStamp"));
+				insertCommand.setContent(insertCommandObject.getString("content"));
+				insertCommand.setIndex(insertCommandObject.getInt("index"));
+				predictionManager.processEvent((ICommand) insertCommand);
+			}
 		}
 		JSONArray deleteCommands = obj.getJSONArray("deleteCommands");
 		for (int i = 0; i < deleteCommands.length(); i++) {
-			DeleteCommand deleteCommand = new ADeleteCommand();
 			deleteCommandObject = deleteCommands.getJSONObject(i);
-			((ICommand) deleteCommand).setTimestamp(deleteCommandObject.getLong("timeStamp"));
-			deleteCommand.setEndIndex(deleteCommandObject.getInt("endIndex"));
-			deleteCommand.setStartIndex(deleteCommandObject.getInt("startIndex"));
-			predictionManager.processEvent((ICommand) deleteCommand);
+			// if more than 100 characters are being deleted, assume this is a
+			// large delete command
+			if (deleteCommandObject.getInt("endIndex") - deleteCommandObject.getInt("startIndex") > 100) {
+				DeleteCommand largeDeleteCommand = new ALargeDeleteCommand();
+				((ICommand) largeDeleteCommand).setTimestamp(deleteCommandObject.getLong("timeStamp"));
+				largeDeleteCommand.setEndIndex(deleteCommandObject.getInt("endIndex"));
+				largeDeleteCommand.setStartIndex(deleteCommandObject.getInt("startIndex"));
+				predictionManager.processEvent((ICommand) largeDeleteCommand);
+				// otherwise, it is a regular delete command
+			} else {
+				DeleteCommand deleteCommand = new ADeleteCommand();
+				((ICommand) deleteCommand).setTimestamp(deleteCommandObject.getLong("timeStamp"));
+				deleteCommand.setEndIndex(deleteCommandObject.getInt("endIndex"));
+				deleteCommand.setStartIndex(deleteCommandObject.getInt("startIndex"));
+				predictionManager.processEvent((ICommand) deleteCommand);
+			}
 		}
 		JSONArray boldCommands = obj.getJSONArray("boldCommands");
 		for (int i = 0; i < boldCommands.length(); i++) {
@@ -122,6 +153,13 @@ public class AMyJSONParser implements MyJSONParser {
 			switchTabsCommandObject = switchTabCommands.getJSONObject(i);
 			switchTabCommand.setTimestamp(switchTabsCommandObject.getLong("timeStamp"));
 			predictionManager.processEvent(switchTabCommand);
+		}
+		JSONArray windowFocusCommands = obj.getJSONArray("windowFocusCommands");
+		for (int i = 0; i < windowFocusCommands.length(); i++) {
+			ICommand windowFocusCommand = new AWindowFocusCommand();
+			windowFocusCommandObject = windowFocusCommands.getJSONObject(i);
+			windowFocusCommand.setTimestamp(windowFocusCommandObject.getLong("timeStamp"));
+			predictionManager.processEvent(windowFocusCommand);
 		}
 		JSONArray updateURLCommands = obj.getJSONArray("updateURLCommands");
 		for (int i = 0; i < updateURLCommands.length(); i++) {
