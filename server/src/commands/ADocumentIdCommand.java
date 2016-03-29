@@ -8,7 +8,7 @@ import edu.cmu.scs.fluorite.commands.AbstractCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
-public class ADocumentIdCommand extends AbstractCommand implements DocumentIdCommand {
+public class ADocumentIdCommand extends AbstractCommand {
 
 	private long timestamp;
 	private String documentId;
@@ -77,14 +77,6 @@ public class ADocumentIdCommand extends AbstractCommand implements DocumentIdCom
 	public boolean execute(IEditorPart target) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	public String getDocumentId() {
-		return documentId;
-	}
-
-	public void setDocumentId(String newDocumentId) {
-		documentId = newDocumentId;
 	}
 
 }

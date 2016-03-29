@@ -1,4 +1,4 @@
-package socket;
+package client;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +13,6 @@ import commands.BoldCommand;
 import commands.CollaborationCommand;
 import commands.CreateNewTabCommand;
 import commands.DeleteCommand;
-import commands.DocumentIdCommand;
 import commands.HighlightCommand;
 import commands.InsertCommand;
 import commands.ItalicizeCommand;
@@ -24,7 +23,6 @@ import commands.SwitchTabsCommand;
 import commands.UnderlineCommand;
 import commands.UpdateURLCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
-import predictions.DocumentPredictionManager;
 
 public class AMyJSONParser implements MyJSONParser {
 
@@ -36,15 +34,18 @@ public class AMyJSONParser implements MyJSONParser {
 
 	public Object parse(String jsonString) {
 		JSONObject obj = new JSONObject(jsonString);
+		System.out.println(jsonString);
 		if (obj.has("type")) {
 			if (obj.get("type").equals("command")) {
 				parseCommand(obj);
 			} else if (obj.get("type").equals("statusUpdate")) {
 				predictionManager.handleStatusUpdate(obj);
 			} else if (obj.get("type").equals("documentId")) {
-				DocumentIdCommand idCommand = new ADocumentIdCommand();
-				idCommand.setDocumentId(obj.getString("documentId"));
-				predictionManager.processEvent((ICommand) idCommand);
+				long longId = obj.getLong("documentId");
+				ICommand idCommand = new ADocumentIdCommand();
+				idCommand.setTimestamp(longId);
+				predictionManager.setDocumentId(longId);
+				predictionManager.processEvent(idCommand);
 			}
 		}
 		return obj;

@@ -1,4 +1,4 @@
-package socket;
+package client;
 
 public interface MyJSONParser {
 	

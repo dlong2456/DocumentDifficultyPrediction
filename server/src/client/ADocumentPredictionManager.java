@@ -1,5 +1,9 @@
-package predictions;
+package client;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -12,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.json.JSONObject;
 
+import analyzer.ui.APredictionController;
 import config.FactorySingletonInitializer;
 import difficultyPrediction.APredictionParameters;
 import difficultyPrediction.DifficultyPredictionSettings;
@@ -21,105 +26,114 @@ import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand;
 import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand.Status;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
-import socket.MyWebSocket;
 
 public class ADocumentPredictionManager implements DocumentPredictionManager {
-	private boolean enabled = true;
-	private MyWebSocket webSocketHandler;
 	private static int currentStatus; // 1 for making progress, 0 for facing
 										// difficulty
+	private static Socket client;
+	private long documentId; 
 
-	public ADocumentPredictionManager(MyWebSocket newWebSocketHandler) {
-		webSocketHandler = newWebSocketHandler;
+	public static void main(String[] args) {
+		System.out.println("Client created");
+		DocumentPredictionManager predictionManager = new ADocumentPredictionManager();
+		// The port number is passed as an argument when the process is run
+		int port = Integer.parseInt(args[0]);
+		try {
+			client = new Socket("localhost", port);
+			System.out.println("Client connected to " + client.getRemoteSocketAddress());
+			Thread messageReceiver = new AClientMessageReceiver(client, predictionManager);
+			messageReceiver.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public ADocumentPredictionManager() {
+		System.out.println("creating event recorder, etc");
 		APredictionParameters.getInstance().setCommandClassificationScheme(CommandClassificationSchemeName.A5);
+		APredictionParameters.getInstance().setStartupLag(0);
+		APredictionParameters.getInstance().setSegmentLength(5);
 		DifficultyPredictionSettings.setReplayMode(true);
 		FactorySingletonInitializer.configure();
 		EventRecorder.getInstance().initCommands();
 		DifficultyRobot.getInstance().addStatusListener(this);
-		DifficultyPredictionSettings.setSegmentLength(10);
+		APredictionController.createUI();
+//		DifficultyPredictionSettings.setSegmentLength(5);
+//		DifficultyPredictionSettings.set
 	}
 
 	public void processEvent(ICommand event) {
-		//Only process events if there is currently a websocket session running for this document
-		if (enabled) {
-			EventRecorder.getInstance().recordCommand(event);
-		}
+		EventRecorder.getInstance().recordCommand(event);
 	}
 
 	@Override
 	public void newStatus(String aStatus) {
+		System.out.println("NEW STATUS STRING: " + currentStatus);
+
 		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void newAggregatedStatus(String aStatus) {
-		// TODO Auto-generated method stub
 	}
 
-	public void setWebSocketHandler(MyWebSocket newWebSocketHandler) {
-		webSocketHandler = newWebSocketHandler;
-	}
-
-	public void disable() {
-		enabled = false;
-	}
-
-	public void enable() {
-		enabled = true;
-	}
-
-	// Listens to status events. When a status is received, this updates the
-	// currentStatus and sends the status to the client
 	@Override
 	public void newStatus(int aStatus) {
-		// Only make status updates if there is currently a web socket session
-		// running for this document
-		if (enabled) {
-			currentStatus = aStatus;
-			// If student is struggling, then send an email to notify the
-			// teacher.
-			if (aStatus != currentStatus && currentStatus == 0) {
-				sendEmail();
-			}
-			// Send the prediction to be displayed to the student.
-			try {
-				webSocketHandler.sendMessage("{ status: '" + currentStatus + "'}");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+
 	}
 
 	public void handleStatusUpdate(JSONObject obj) {
-		int newStatus = obj.getInt("makingProgress");
+		int newStatus = obj.getInt("facingDifficulty");
+		System.out.println("new status: " + newStatus);
+		System.out.println("Old status: " + currentStatus);
 		if (newStatus != currentStatus) {
 			currentStatus = newStatus;
 			Status status;
 			if (currentStatus == 0) {
-				status = Status.Insurmountable;
-			} else {
 				status = Status.Making_Progress;
+			} else {
+				status = Status.Insurmountable;
 			}
 			ICommand statusCommand = new DifficulyStatusCommand(status);
+			System.out.println("sending command to eventrecorder");
 			processEvent(statusCommand);
 			// If student is struggling, then send an email to notify the
 			// teacher.
-			if (currentStatus == 0) {
+			System.out.println("Current Status: " + currentStatus);
+			if (currentStatus == 1) {
+				System.out.println("sending an email");
 				sendEmail();
 			}
 		}
 	}
 
+	// Listens to status events. When a status is received, this updates the
+	// currentStatus and sends the status to the server
 	@Override
 	public void newAggregatedStatus(int aStatus) {
-		// TODO Auto-generated method stub
-
+		currentStatus = aStatus;
+		System.out.println("NEW AGGREGATED STATUS: " + currentStatus);
+		// If student is struggling, then send an email to notify the
+		// teacher.
+		if (aStatus != currentStatus && currentStatus == 1) {
+			sendEmail();
+		}
+		// Send the prediction to be displayed to the student.
+		sendMessageToServer("{ status: '" + currentStatus + "'}");
 	}
 
 	@Override
 	public void newManualStatus(String aStatus) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	public long getDocumentId() {
+		return documentId;
+	}
+	
+	public void setDocumentId(long newId) {
+		documentId = newId;
 	}
 
 	public int getStatus() {
@@ -170,7 +184,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 			message.setSubject("Student Difficulty Notification");
 
 			// Now set the actual message
-			message.setText("A student is facing difficulty! Click here to help them out: ");
+			message.setText("A student is facing difficulty! Visit document " + documentId + " to help them out!");
 
 			// Send message
 			Transport.send(message);
@@ -178,6 +192,18 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 			mex.printStackTrace();
 		}
 
+	}
+
+	public void sendMessageToServer(String message) {
+		OutputStream outToServer;
+		try {
+			outToServer = client.getOutputStream();
+			DataOutputStream out = new DataOutputStream(outToServer);
+			out.writeUTF(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

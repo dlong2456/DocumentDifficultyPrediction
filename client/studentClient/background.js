@@ -15,6 +15,50 @@ var numberOfCommands = 0;
 var chromeInFocus = 1;
 var documentId;
 var documentIdFound = 0;
+var status = 'pending';
+//List of the docIDs we are using for the study
+var docIDList = [
+"1utnT3bYBZJf_M3NFb7CBVqpop4pIdR_AnZBo6pcjr8s",
+"1cEe3hOc6hOQZbYrL1ojlIIPWqChNTIaP-rxDOhqVY4o",
+"1znDjpT1DmRL5d55UK9GXhoicymICt7CE7lBmpyeEE-Y",
+"16_j0WNLvvVlSUG0LcSCc_PRbmN0X8SpNUAI5gQ6DyiI",
+"1PsNChRRfgorPLDNCls8n3IYGu0bq0aCQ2vK7hCOqmNA",
+"1ZtHqc9NGtQ55E38xCzZBBCvNgAz2nWwrhvdf6-2eqPg",
+"1R_42ciqJGjKPYLK8NX8VA2qnbw-LUSqjEnWjv-KtjG4",
+"1YSSmozS3A-RBxzR-dQBgiz5dq4B0a1f9d8Kgunt0dmw",
+"1_DqsfW4_v_SeNZpNRYRDnYnEDVwnRLPmbw9MIWvDkIk",
+"1Zb55vT7OU27w9vPZdYNIbyBVbrsLuCSnnLsAG9nAsmA",
+"1F7Oz6IVRmHgPKV1PvWkHlChtcaYS4J_XDT-CfzbBicw",
+"173XESj7nTT3AtWOzR93BC-md5kDWalNED7hGC6MSrkg",
+"1sqsPUagt8R_luTV6BXGRu51_d08T3Oh-dipgsVNE9dc",
+"1jWTEgxOhUBkQx4qBd6Z91i6yib1R6mzfT3a_cOroUo4",
+"10a6Kh-E5F2FnKew-I47bHTvIKdvC0EiCCyrcd2AUuEk",
+"11vxDHg7KKZYjIi69jdlgEFXrcdNOUqmAoyoxIJCaDJY",
+"1eCScFpbcEeqtJUyyy63boQ2AOIzfSP9XmXVkfMFiu7g",
+"1ZXOHpZ8ez0m6efKIZ5M7li2mieQUrs4jsnx9JQm_AxY",
+"1Obo7N7IPu2-muLJ43TjvAPy7v23W5LvFdMG1N-E-tzE",
+"1FHM0P74zOzqiMSgghiMeb5mIDhjWj3z9qlK_K2k8C98",
+"1aR6K2ld_Hn3fGq6wOaOQTp_vmvPlekhisGSxLOu9DkE",
+"1t68zyyf6VWgkzWo50TO_yEzN_FUE56EO_3JlT7zz3Q0",
+"1DSlcBm_NYHSZmmGWqk43xwex_Yo8M72M1VZ9ejMDCY0",
+"1fc4WLpuRFP4fP6uwr0JmIYat9eFfR6lZJ3lHz-0steA",
+"15z4a9HvKUYps56MARXffWTlVMFzcaVlP5vwLRvapEWM",
+"1CEE4iEuw-6liGOrCOrv9cT68LigNoJDeIsqDYYVtjU0",
+"1QykAhwwRunhp6QPEhaHSfxtqSAq0J7sdwiaf5JH5its",
+"1kWQCeaWIRRsqbApb3zLrZm0qCRWqfDk48ewaIVUVnmw",
+"1bQKmqyxqHweOanrgABlNUzUcVvyTMrNsaKrrC5g4YaU",
+"1GWPnhLkICgXJYpFxyOFtxFquJgFLJ1WhnqKtSMUJ9Hs",
+"1_0wSnzPhcZ6Pwd-elcnu-3i2c8VAPdNizSZdKX6yirE",
+"1rxLuEdpFa1oIcvK3_YEiRfmC-AwwDsFXlrbf_s00O5Q",
+"1ZMe6OhGZfsJWhJ3bHucyMICjBy9icvCaCzPJs3ofcYk",
+"1xZONI7xDlb9qdltAdah6p9Ig3PLhOrOX9GtDUU_Mbu4",
+"1hVrQjxkcoOkEnDGoclnXymjKizjiWyR6E_P5Py_H7R0",
+"1XEyyogKV7lcNUuckPXnP6zKhhmg2zbA30suP7tb4WRk",
+"1FSk_Coa86sSxN9LT4rpq4pCUtUjZKbv4_og6rLTWVMg",
+"1AM11GlDR899B_1Skmz0s0D7sak-X_b7FVnu1l2PiEHk",
+"1nMgO_pEiwpiqPoAOoendaqzu-cwmYW3QOQ9rpKFCQeM",
+"15ZFb-5JC97-svNGSN9XhYnxoIrbFBIT0ntmMKCFfkgw"
+];
 
 //MESSAGE PASSING
 
@@ -37,7 +81,7 @@ chrome.runtime.onMessage.addListener(function(request) {
   } else if (request.type === "statusUpdate") {
       var statusUpdateObject = {
         type: "statusUpdate",
-        makingProgress: request.makingProgress,
+        facingDifficulty: request.facingDifficulty,
         difficultyType: request.difficultyType,
         details: request.details
       };
@@ -62,11 +106,14 @@ ws.onmessage = function (evt) {
     var json = JSON.stringify(eval("(" + data + ")"));
     var jsonData = JSON.parse(json);
     if (jsonData.hasOwnProperty("status")) {
+      status = jsonData.status;
       sendToContent(jsonData.status);
     }
 };
 
 ws.onclose = function() {
+  status = 'pending';
+  sendToContent("close");
 };
 
 ws.onerror = function(err) {
@@ -120,7 +167,16 @@ chrome.webRequest.onBeforeRequest.addListener(
           "bundles": requestBody.formData.bundles,
           "timeStamp" : parseInt(request.timeStamp, 10)
         };
-        parseData(data);
+        //This is a hack so that we only listen to edit commands on the Google Doc we are interested in
+        //Again, I think there is a better way to do this but this was the quickest fix
+        if (documentIdFound === 1) {
+          checkURL(function(docId) {
+            if(docId === documentId) {
+              console.log("Parsing Data");
+              parseData(data);
+            }
+          });
+        }
       } else if (request.url.indexOf('/sync?') != -1) {
         //this is a suggested revision or a comment
         console.log("CollaborationCommand");
@@ -150,7 +206,6 @@ var DeleteCommand = function (timestamp, startIndex, endIndex) {
 };
 
 var InsertCommand = function (timestamp, index, content) {
-  // console.log(timestamp);
   this.timeStamp = timestamp;
   this.index = index;
   this.content = content;
@@ -217,20 +272,24 @@ function processCommands(command, timeStamp) {
   } else if (command.ty === 'as') {
     //TODO: distinguish between bold and unbold, etc.
     var styleCommand;
-    if(command.sm.hasOwnProperty('ts_bd_i')) {
+    if(command.sm.hasOwnProperty('ts_bd')) {
+      console.log("bold command");
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'bold');
       boldCommands.push(styleCommand);
-    } else if (command.sm.hasOwnProperty('ts_it_i')) {
+    } else if (command.sm.hasOwnProperty('ts_it')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'italics');
       italicizeCommands.push(styleCommand);
-    } else if (command.sm.hasOwnProperty('ts_un_i')) {
+    } else if (command.sm.hasOwnProperty('ts_un')) {
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'underline');
       underlineCommands.push(styleCommand);
-    } else if (command.sm.hasOwnProperty('ts_bgc_i')) {
-      styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'highlight');
-      styleCommand.highlightColor = command.ts_bgc;
-      highlightCommands.push(styleCommand);
-    } else if (command.sm.hasOwnProperty('ts_fgc_i')) {
+    } else if (command.sm.hasOwnProperty('ts_bgc')) {
+      //Don't count white highlights because these show up in paste/large insert mlti commands as well
+      if (command.sm.ts_bgc !== "#ffffff") {
+        styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'highlight');
+        styleCommand.highlightColor = command.ts_bgc;
+        highlightCommands.push(styleCommand);
+      }
+    } else if (command.sm.hasOwnProperty('ts_fgc')) {
       //TODO: handle this and send to server
       // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'font color change');
       // styleCommand.fontColor = command.ts_fgc;
@@ -244,20 +303,22 @@ function processCommands(command, timeStamp) {
 
 //function called on typing new URL in a tab 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.url !== undefined) { //if statement prevents it from firing on refresh or iframe load
+  if (changeInfo.url !== undefined) { //if statement prevents commands from firing on refresh or iframe load
     if(documentIdFound === 0) {
-      checkURL();
+      checkURL(sendDocId);
     }
     var updateURLCommand = new UpdateURLCommand(Date.now());
     updateURLCommands.push(updateURLCommand);
     newCommand();
+  } else { //on refresh, make sure to resend the status to content.js
+    sendToContent(status);
   }
 });
 
 //on switching tabs
 chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
   if(documentIdFound === 0) {
-    checkURL();
+    checkURL(sendDocId);
   }
   var switchTabCommand = new SwitchTabCommand(Date.now());
   switchTabCommands.push(switchTabCommand);
@@ -267,7 +328,7 @@ chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
 //on creating a tab (calls update and activate also)
 chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
   if(documentIdFound === 0) {
-    checkURL();
+    checkURL(sendDocId);
   }
   var createNewTabCommand = new CreateNewTabCommand(Date.now());
   createNewTabCommands.push(createNewTabCommand);
@@ -275,21 +336,122 @@ chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
 });
 
 //Detects when the user is on a Google Docs tab.
-function checkURL() {
+function checkURL(cb) {
   chrome.tabs.getSelected(null, function(tab) {
     if(/^(https:\/\/docs\.google\.com)/.test(tab.url)) {
       var match = tab.url.match(/^(https:\/\/docs\.google\.com\/document\/d\/(.*?)\/edit)/);
       documentId = match[2];
-      var docIdObject = {
-        type: "documentId",
-        documentId: documentId
-      };
-      ws.send(JSON.stringify(docIdObject));
-      //TODO: Send ID to server
-      //Set this so we don't have to keep polling now that we have found the ID
-      documentIdFound = 1;
+      //This is a hack in case the first document the user visits is not the one we are interested in tracking
+      //There is probably a better way to do this but this was the quickest fix for now
+      for (var i = 0; i < docIDList.length; i++) {
+        if (documentId === docIDList[i]) {
+          //Set this so we don't have to keep polling now that we have found the ID
+          documentIdFound = 1;
+          cb(documentId);
+        }
+      }
     }
   });
+}
+
+function sendDocId(docId) {
+  if (docId !== null && docId !== undefined) {
+    var numericDocId = getNumericValFromDocId(docId);
+    console.log(numericDocId);
+    var docIdObject = {
+      type: "documentId",
+      documentId: numericDocId
+    };
+    //Send Document ID to server
+    ws.send(JSON.stringify(docIdObject));
+  }
+}
+
+function getNumericValFromDocId(docId) {
+  switch(docId) {
+    case  "1utnT3bYBZJf_M3NFb7CBVqpop4pIdR_AnZBo6pcjr8s":
+      return 1;
+    case "1cEe3hOc6hOQZbYrL1ojlIIPWqChNTIaP-rxDOhqVY4o":
+      return 2;
+    case "1znDjpT1DmRL5d55UK9GXhoicymICt7CE7lBmpyeEE-Y":
+      return 3;
+    case "16_j0WNLvvVlSUG0LcSCc_PRbmN0X8SpNUAI5gQ6DyiI":
+      return 4;
+    case "1PsNChRRfgorPLDNCls8n3IYGu0bq0aCQ2vK7hCOqmNA":
+      return 5;
+    case "1ZtHqc9NGtQ55E38xCzZBBCvNgAz2nWwrhvdf6-2eqPg":
+      return 6;
+    case "1R_42ciqJGjKPYLK8NX8VA2qnbw-LUSqjEnWjv-KtjG4":
+      return 7;
+    case "1YSSmozS3A-RBxzR-dQBgiz5dq4B0a1f9d8Kgunt0dmw":
+      return 8;
+    case "1_DqsfW4_v_SeNZpNRYRDnYnEDVwnRLPmbw9MIWvDkIk":
+      return 9;
+    case "1Zb55vT7OU27w9vPZdYNIbyBVbrsLuCSnnLsAG9nAsmA":
+      return 10;
+    case "1F7Oz6IVRmHgPKV1PvWkHlChtcaYS4J_XDT-CfzbBicw":
+      return 11;
+    case "173XESj7nTT3AtWOzR93BC-md5kDWalNED7hGC6MSrkg":
+      return 12;
+    case "1sqsPUagt8R_luTV6BXGRu51_d08T3Oh-dipgsVNE9dc":
+      return 13;
+    case "1jWTEgxOhUBkQx4qBd6Z91i6yib1R6mzfT3a_cOroUo4":
+      return 14;
+    case "10a6Kh-E5F2FnKew-I47bHTvIKdvC0EiCCyrcd2AUuEk":
+      return 15;
+    case "11vxDHg7KKZYjIi69jdlgEFXrcdNOUqmAoyoxIJCaDJY":
+      return 16;
+    case "1eCScFpbcEeqtJUyyy63boQ2AOIzfSP9XmXVkfMFiu7g":
+      return 17;
+    case "1ZXOHpZ8ez0m6efKIZ5M7li2mieQUrs4jsnx9JQm_AxY":
+      return 18;
+    case "1Obo7N7IPu2-muLJ43TjvAPy7v23W5LvFdMG1N-E-tzE":
+      return 19;
+    case "1FHM0P74zOzqiMSgghiMeb5mIDhjWj3z9qlK_K2k8C98":
+      return 20;
+    case "1aR6K2ld_Hn3fGq6wOaOQTp_vmvPlekhisGSxLOu9DkE":
+      return 21;
+    case "1t68zyyf6VWgkzWo50TO_yEzN_FUE56EO_3JlT7zz3Q0":
+      return 22;
+    case "1DSlcBm_NYHSZmmGWqk43xwex_Yo8M72M1VZ9ejMDCY0":
+      return 23;
+    case "1fc4WLpuRFP4fP6uwr0JmIYat9eFfR6lZJ3lHz-0steA":
+      return 24;
+    case "15z4a9HvKUYps56MARXffWTlVMFzcaVlP5vwLRvapEWM":
+      return 25;
+    case "1CEE4iEuw-6liGOrCOrv9cT68LigNoJDeIsqDYYVtjU0":
+      return 26;
+    case "1QykAhwwRunhp6QPEhaHSfxtqSAq0J7sdwiaf5JH5its":
+      return 27;
+    case "1kWQCeaWIRRsqbApb3zLrZm0qCRWqfDk48ewaIVUVnmw":
+      return 28;
+    case "1bQKmqyxqHweOanrgABlNUzUcVvyTMrNsaKrrC5g4YaU":
+      return 29;
+    case "1GWPnhLkICgXJYpFxyOFtxFquJgFLJ1WhnqKtSMUJ9Hs":
+      return 30;
+    case "1_0wSnzPhcZ6Pwd-elcnu-3i2c8VAPdNizSZdKX6yirE":
+      return 31;
+    case "1rxLuEdpFa1oIcvK3_YEiRfmC-AwwDsFXlrbf_s00O5Q":
+      return 32;
+    case "1ZMe6OhGZfsJWhJ3bHucyMICjBy9icvCaCzPJs3ofcYk":
+      return 33;
+    case "1xZONI7xDlb9qdltAdah6p9Ig3PLhOrOX9GtDUU_Mbu4":
+      return 34;
+    case "1hVrQjxkcoOkEnDGoclnXymjKizjiWyR6E_P5Py_H7R0":
+      return 35;
+    case "1XEyyogKV7lcNUuckPXnP6zKhhmg2zbA30suP7tb4WRk":
+      return 36;
+    case "1FSk_Coa86sSxN9LT4rpq4pCUtUjZKbv4_og6rLTWVMg":
+      return 37;
+    case "1AM11GlDR899B_1Skmz0s0D7sak-X_b7FVnu1l2PiEHk":
+      return 38;
+    case "1nMgO_pEiwpiqPoAOoendaqzu-cwmYW3QOQ9rpKFCQeM":
+      return 39;
+    case "15ZFb-5JC97-svNGSN9XhYnxoIrbFBIT0ntmMKCFfkgw":
+      return 40;
+    default:
+        return 0;
+  }
 }
 
 //to tell when Chrome loses focus

@@ -1,6 +1,6 @@
 //****UI BUTTON CODE****//
 //TODO: Make a "Ask for Help" button
-//TODO; Make a "Comments" text field
+//TODO: Make a "Comments" text field
 //TODO: Figure out how to pull HTML strings from documents so they are more readable/editable
 
 //Create 'Facing difficulty' button
@@ -14,7 +14,7 @@ $progress_button.prependTo($('.docs-titlebar-buttons'));
 $progress_button.addClass('jfk-button-clear-outline');
 
 //Set difficulty status and create status display
-var statusText = 'No status yet'; //either 'No status yet', Progress' or 'Slow progress'. Backend will change it based on status.
+var statusText = 'Pending'; //either 'No status yet', Progress' or 'Slow progress'. Backend will change it based on status.
 var $status = $('<div id="status" class="goog-inline-block" aria-label="Difficulty status" style="-webkit-user-select: none;" tabindex="0"><span id="status-text" style = "color: #458B00">' + statusText + '</span>&nbsp;&nbsp;&nbsp;&nbsp;</div>');
 $status.prependTo($('.docs-titlebar-buttons'));
 
@@ -30,11 +30,16 @@ function changeColor() {
 	if (statusText === 'Progress') {
 		//Green
 		document.getElementById('status-text').style.color = "#32CD32";
-	} else {
+	} else if (statusText === 'Slow progress') {
 		//Red
 		document.getElementById('status-text').style.color = "#FF0000";
+	} else {
+		//Black
+		document.getElementById('status-text').style.color = "#000000";
 	}
 }
+
+changeColor();
 
 //****BUTTON EVENT LISTENERS****//
 
@@ -74,7 +79,7 @@ $progress_button.click(function() {
 	//Otherwise, select it and notify backend
     } else {
 		//tell background.js that the user made a status correction
-		chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", makingProgress: 1}, function(response) {
+		chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", facingDifficulty: 0}, function(response) {
 		});
 		//change status text and color
 		statusText = 'Progress';
@@ -200,11 +205,10 @@ $('#submit').click(function() {
 	} else if ($("#content").hasClass('goog-option-selected')) {
 		type = 'content';
 	}
-	console.log($('#status-content').val());
 	//tell background.js that the user made a status correction
-	chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", difficultyType: type, details: $('#status-content').val(), makingProgress: 0}, function(response) {
+	chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", difficultyType: type, details: $('#status-content').val(), facingDifficulty: 1}, function(response) {
 	});
-})
+});
 
 //Hover events
 $('#spelling').mouseenter(function() {
@@ -292,12 +296,21 @@ window.addEventListener('scroll', throttled, true);
 //receive messages from background.js
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		if (request.message === '0') {
+		console.log('receiving status' + request.message);
+		if (request.message === '1') {
 			statusText = 'Slow progress';
 			$('#status-text').text(statusText);
 			changeColor();
-		} else if (request.message === '1') {
+		} else if (request.message === '0') {
 			statusText = 'Progress';
+			$('#status-text').text(statusText);
+			changeColor();
+		} else if (request.message === 'close') {
+			statusText = 'Pending';
+			$('#status-text').text(statusText);
+			changeColor();
+		} else if (request.message === 'pending') {
+			statusText = 'Pending';
 			$('#status-text').text(statusText);
 			changeColor();
 		}

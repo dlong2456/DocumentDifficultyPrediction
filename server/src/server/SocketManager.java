@@ -1,4 +1,4 @@
-package socket;
+package server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,18 +11,19 @@ public class SocketManager {
 		return INSTANCE;
 	}
 
-	private List<MyWebSocket> members = new ArrayList<>();
+	private List<MyWebSocket> frontendSockets = new ArrayList<>();
 
-	public void join(MyWebSocket socket) {
-		members.add(socket);
+	public void join(MyWebSocket frontendSocket) {
+		frontendSockets.add(frontendSocket);
 	}
 
 	public void part(MyWebSocket socket) {
-		members.remove(socket);
+		int index = frontendSockets.indexOf(socket);
+		frontendSockets.remove(socket);
 	}
 
 	public void writeAllMembers(String message) {
-		for (MyWebSocket member : members) {
+		for (MyWebSocket member : frontendSockets) {
 			member.getSession().getRemote().sendStringByFuture(message);
 		}
 	}
@@ -33,7 +34,7 @@ public class SocketManager {
 	}
 
 	public MyWebSocket findMemberByName(String memberName) {
-		return members.get(0);
+		return frontendSockets.get(0);
 		// left as exercise to reader
 	}
 }
