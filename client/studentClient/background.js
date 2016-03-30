@@ -13,6 +13,7 @@ var windowFocusCommands = [];
 var updateURLCommands  = [];
 var spellcheckCommands = [];
 var collaborationCommands = [];
+var cursorCommands = [];
 var numberOfCommands = 0;
 var chromeInFocus = 1;
 var documentId;
@@ -99,6 +100,10 @@ chrome.runtime.onMessage.addListener(function(request) {
       var scrollCommand = new ScrollCommand(request.timestamp);
       scrollCommands.push(scrollCommand);
       newCommand();
+  } else if (request.type === "cursor") {
+    var cursorCommand = new CursorCommand(request.timestamp, request.left, request.top);
+    cursorCommands.push(cursorCommand);
+    newCommand();
   }
 });
 
@@ -149,7 +154,8 @@ function newCommand() {
       updateURLCommands : updateURLCommands,
       createNewTabCommands : createNewTabCommands,
       switchTabCommands : switchTabCommands,
-      windowFocusCommands: windowFocusCommands
+      windowFocusCommands: windowFocusCommands,
+      cursorCommands: cursorCommands
     };
     //Send the object
     ws.send(JSON.stringify(commandObject));
@@ -168,10 +174,17 @@ function newCommand() {
     createNewTabCommands = [];
     switchTabCommands = [];
     windowFocusCommands = [];
+    cursorCommands = [];
   }
 }
 
 //DEFINE COMMAND OBJECTS
+var CursorCommand = function(timeStamp, left, top) {
+  this.timeStamp = timeStamp;
+  this.left = left;
+  this.top = top;
+};
+
 var CollaborationCommand = function(timeStamp) {
   this.timeStamp = timeStamp;
 };
@@ -285,27 +298,27 @@ function processCommands(command, timeStamp) {
     newCommand();
   //STYLE
   } else if (command.ty === 'as') {
+    //NOTE: These are all disabled right now because they fire unpredictably during paste commands and it throws off the ratios
     //TODO: distinguish between bold and unbold, etc.
     var styleCommand;
     //Note: these all need to be of the format ts_.. not ts_.._i because otherwise they show
     //up in paste/large insert mlti commands as well and it throws off the ratios
     if(command.sm.hasOwnProperty('ts_bd')) {
-      console.log("bold command");
-      styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'bold');
-      boldCommands.push(styleCommand);
+      // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'bold');
+      // boldCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_it')) {
-      styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'italics');
-      italicizeCommands.push(styleCommand);
+      // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'italics');
+      // italicizeCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_un')) {
-      styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'underline');
-      underlineCommands.push(styleCommand);
+      // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'underline');
+      // underlineCommands.push(styleCommand);
     } else if (command.sm.hasOwnProperty('ts_bgc')) {
       //Don't count white highlights because these show up in paste/large insert mlti commands as well
-      if (command.sm.ts_bgc !== "#ffffff") {
-        styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'highlight');
-        styleCommand.highlightColor = command.sm.ts_bgc;
-        highlightCommands.push(styleCommand);
-      }
+      // if (command.sm.ts_bgc !== "#ffffff") {
+      //   styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'highlight');
+      //   styleCommand.highlightColor = command.sm.ts_bgc;
+      //   highlightCommands.push(styleCommand);
+      // }
     } else if (command.sm.hasOwnProperty('ts_fgc')) {
       //TODO: handle this and send to server
       // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'font color change');

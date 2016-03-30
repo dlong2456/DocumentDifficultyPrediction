@@ -56,7 +56,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		FactorySingletonInitializer.configure();
 		EventRecorder.getInstance().initCommands();
 		DifficultyRobot.getInstance().addStatusListener(this);
-//		APredictionController.createUI();
+		APredictionController.createUI();
 	}
 
 	public void processEvent(ICommand event) {
@@ -75,7 +75,15 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 
 	@Override
 	public void newStatus(int aStatus) {
-		// TODO Auto-generated method stub
+		currentStatus = aStatus;
+		System.out.println("NEW STATUS: " + currentStatus);
+		// If student is struggling, then send an email to notify the
+		// teacher.
+		if (aStatus != currentStatus && currentStatus == 1) {
+			sendEmail();
+		}
+		// Send the prediction to be displayed to the student.
+		sendMessageToServer("{ status: '" + currentStatus + "'}");
 	}
 
 	public void handleStatusUpdate(JSONObject obj) {
@@ -89,20 +97,16 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 				status = Status.Insurmountable;
 			}
 			ICommand statusCommand = new DocumentStatusCorrection(status);
-			statusCommand.setTimestamp(obj.getLong("timestamp"));
 			// If student is struggling
 			if (newStatus == 1) {
+				// And log extra details about the status update
+				((DocumentStatusCorrection) statusCommand).setDetails(obj.getString("details"));
+				((DocumentStatusCorrection) statusCommand).setType(obj.getString("difficultyType"));
 				// Send email to notify the teacher
 				sendEmail();
-				// And log extra details about the status update
-				System.out.println("details: " + obj.getString("details"));
-				((DocumentStatusCorrection) statusCommand).setDetails(obj.getString("details"));
-				System.out.println("difficulty type: " + obj.getString("difficultyType"));
-				((DocumentStatusCorrection) statusCommand).setType(obj.getString("difficultyType"));
 			}
 			// Send command to EventRecorder
 			processEvent(statusCommand);
-			System.out.println("Event sent");
 		}
 	}
 
@@ -110,15 +114,15 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	// currentStatus and sends the status to the server
 	@Override
 	public void newAggregatedStatus(int aStatus) {
-		currentStatus = aStatus;
-		System.out.println("NEW AGGREGATED STATUS: " + currentStatus);
-		// If student is struggling, then send an email to notify the
-		// teacher.
-		if (aStatus != currentStatus && currentStatus == 1) {
-			sendEmail();
-		}
-		// Send the prediction to be displayed to the student.
-		sendMessageToServer("{ status: '" + currentStatus + "'}");
+//		currentStatus = aStatus;
+//		System.out.println("NEW AGGREGATED STATUS: " + currentStatus);
+//		// If student is struggling, then send an email to notify the
+//		// teacher.
+//		if (aStatus != currentStatus && currentStatus == 1) {
+//			sendEmail();
+//		}
+//		// Send the prediction to be displayed to the student.
+//		sendMessageToServer("{ status: '" + currentStatus + "'}");
 	}
 
 	@Override
@@ -132,6 +136,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	}
 
 	public void setDocumentId(long newId) {
+		System.out.println("Setting document Id: " + newId);
 		documentId = newId;
 	}
 

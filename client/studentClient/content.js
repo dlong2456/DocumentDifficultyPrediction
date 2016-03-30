@@ -291,6 +291,23 @@ window.addEventListener('scroll', throttled, true);
 //     }
 // });
 
+var cursorLeft;
+var cursorTop;
+//function that is called on cursor events
+document.addEventListener('click', function() {
+	var element = document.getElementsByClassName('kix-cursor docs-ui-unprintable')[0];
+    var style = window.getComputedStyle(element);
+    newTop = style.getPropertyValue('top');
+    newLeft = style.getPropertyValue('left');
+    if (newTop !== cursorTop || newLeft !== cursorLeft) {
+		//Tell background JS that the cursor moved
+		chrome.runtime.sendMessage({timestamp: Date.now(), type: "cursor", left: newLeft, top: newTop}, function(response) {
+		});
+		cursorLeft = newLeft;
+		cursorTop = newTop;
+    }
+});
+
 //***MESSAGE HANDLING CODE***//
 
 //Receive messages from background.js

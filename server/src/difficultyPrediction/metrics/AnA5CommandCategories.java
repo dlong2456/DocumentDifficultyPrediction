@@ -8,9 +8,9 @@ public class AnA5CommandCategories extends AnA0CommandCategories {
 			CommandName.DocumentUnderlineCommand, CommandName.DocumentDeleteCommand };
 
 	CommandName[] debugCommands = { CommandName.DocumentCollaborationCommand, CommandName.DocumentSpellcheckCommand,
-			CommandName.DocumentLargeDeleteCommand, CommandName.DocumentLargeInsertCommand };
+			CommandName.DocumentLargeDeleteCommand, CommandName.DocumentLargeInsertCommand, CommandName.DocumentScrollCommand, CommandName.ADocumentCursorMoveCommand };
 
-	CommandName[] navigationCommands = { CommandName.DocumentScrollCommand };
+	CommandName[] navigationCommands = { };
 	CommandName[] focusCommands = { CommandName.DocumentUpdateURLCommand, CommandName.DocumentCreateNewTabCommand,
 			CommandName.DocumentSwitchTabsCommand, CommandName.DocumentWindowFocusCommand };
 

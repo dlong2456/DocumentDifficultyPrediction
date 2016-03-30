@@ -41,7 +41,8 @@ public class AClientMessageReceiver extends Thread {
 				break;
 			} catch (IOException e) {
 				e.printStackTrace();
-				break;
+				System.out.println("Client exiting");
+				System.exit(0);
 			}
 		}
 	}
