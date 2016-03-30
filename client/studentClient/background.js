@@ -1,3 +1,5 @@
+//INITIALIZE VARIABLES 
+
 var insertCommands = [];
 var deleteCommands = [];
 var boldCommands = [];
@@ -15,8 +17,14 @@ var numberOfCommands = 0;
 var chromeInFocus = 1;
 var documentId;
 var documentIdFound = 0;
-var status = 'pending';
+//Initialize status to pending so it will show up on Google Doc 
+var difficultyStatus = 'pending';
+//This is the number of commands we will send in each package to the server
+var commandPackageSize = 10;
+
 //List of the docIDs we are using for the study
+//This method of recording docIDs will need to be modified if this project is expanded
+//Might look into Google Docs API but this was the quickest fix
 var docIDList = [
 "1utnT3bYBZJf_M3NFb7CBVqpop4pIdR_AnZBo6pcjr8s",
 "1cEe3hOc6hOQZbYrL1ojlIIPWqChNTIaP-rxDOhqVY4o",
@@ -106,23 +114,27 @@ ws.onmessage = function (evt) {
     var json = JSON.stringify(eval("(" + data + ")"));
     var jsonData = JSON.parse(json);
     if (jsonData.hasOwnProperty("status")) {
-      status = jsonData.status;
+      difficultyStatus = jsonData.status;
       sendToContent(jsonData.status);
     }
 };
 
 ws.onclose = function() {
-  status = 'pending';
+  //Change status back to pending since socket is closing
+  difficultyStatus = 'pending';
+  //Notify content.js that the socket has closed
   sendToContent("close");
 };
 
 ws.onerror = function(err) {
+  console.log(err);
 };
 
-
+//This prepares commands and sends them in bundles to the server
 function newCommand() {
   numberOfCommands++;
-  if (numberOfCommands >= 10) {
+  if (numberOfCommands >= commandPackageSize) {
+    //Prepare a JSON object to send to server
     var commandObject = {
       type: "command",
       insertCommands : insertCommands,
@@ -139,7 +151,9 @@ function newCommand() {
       switchTabCommands : switchTabCommands,
       windowFocusCommands: windowFocusCommands
     };
+    //Send the object
     ws.send(JSON.stringify(commandObject));
+    //Reset all command arrays for the next bundle
     numberOfCommands = 0;
     insertCommands = [];
     deleteCommands = [];
@@ -157,39 +171,7 @@ function newCommand() {
   }
 }
 
-//Listen for insert, style, and delete commands
-chrome.webRequest.onBeforeRequest.addListener(
-  function(request) {
-      if (request.url.indexOf('/save?') != -1) {
-        var requestBody = request.requestBody;
-        // var docId = request.url.match("docs\.google\.com\/document\/d\/(.*?)\/save")[1];
-        var data = {
-          "bundles": requestBody.formData.bundles,
-          "timeStamp" : parseInt(request.timeStamp, 10)
-        };
-        //This is a hack so that we only listen to edit commands on the Google Doc we are interested in
-        //Again, I think there is a better way to do this but this was the quickest fix
-        if (documentIdFound === 1) {
-          checkURL(function(docId) {
-            if(docId === documentId) {
-              console.log("Parsing Data");
-              parseData(data);
-            }
-          });
-        }
-      } else if (request.url.indexOf('/sync?') != -1) {
-        //this is a suggested revision or a comment
-        console.log("CollaborationCommand");
-        var collaborationCommand = new CollaborationCommand(Date.now());
-        collaborationCommands.push(collaborationCommand);
-        newCommand();
-      }
-    },
-    { urls: ["*://*.google.com/*"] },
-    ['requestBody']
-);
-
-//Defining command objects
+//DEFINE COMMAND OBJECTS
 var CollaborationCommand = function(timeStamp) {
   this.timeStamp = timeStamp;
 };
@@ -238,16 +220,49 @@ var WindowFocusCommand = function(timeStamp) {
   this.timeStamp = timeStamp;
 };
 
+//DETECT AND PARSE GOOGLE WEB REQUESTS
+
+//Listen for insert, style, and delete commands (sent by Google as web requests)
+chrome.webRequest.onBeforeRequest.addListener(
+  function(request) {
+      //All of the Google Docs edit-related web requests start with /save?
+      if (request.url.indexOf('/save?') != -1) {
+        var requestBody = request.requestBody;
+        var data = {
+          "bundles": requestBody.formData.bundles,
+          "timeStamp" : parseInt(request.timeStamp, 10) //TODO: Maybe I should make my own timestamp here?
+        };
+        //This is a hack so that we only listen to edit commands on the Google Doc we are interested in
+        //I think there is a better way to do this but this was the quickest fix
+        if (documentIdFound === 1) {
+          checkURL(function(docId) {
+            if(docId === documentId) {
+              parseData(data);
+            }
+          });
+        }
+      } else if (request.url.indexOf('/sync?') != -1) {
+        //this is a suggested revision or a comment
+        console.log("CollaborationCommand");
+        var collaborationCommand = new CollaborationCommand(Date.now());
+        collaborationCommands.push(collaborationCommand);
+        newCommand();
+      }
+    },
+    { urls: ["*://*.google.com/*"] },
+    ['requestBody']
+);
+
 function parseData(data) {
   var jsonData = JSON.parse(data.bundles[0]);
   var commands = jsonData[0].commands;
   var timeStamp = data.timeStamp;
   var command;
-
   for (var i = 0; i<commands.length; i++) {
     command = commands[i];
-    //INSERT          
     processCommands(command, timeStamp);
+    //Large edits consisting of multiple commands come packaged labeled with the type "mlti"
+    //Here I break down the bundle and parse each command individually
     if (command.ty === 'mlti') {
       var mltiCommands = command.mts;
       for(i = 0; i < mltiCommands.length; i++) {
@@ -272,6 +287,8 @@ function processCommands(command, timeStamp) {
   } else if (command.ty === 'as') {
     //TODO: distinguish between bold and unbold, etc.
     var styleCommand;
+    //Note: these all need to be of the format ts_.. not ts_.._i because otherwise they show
+    //up in paste/large insert mlti commands as well and it throws off the ratios
     if(command.sm.hasOwnProperty('ts_bd')) {
       console.log("bold command");
       styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'bold');
@@ -286,13 +303,13 @@ function processCommands(command, timeStamp) {
       //Don't count white highlights because these show up in paste/large insert mlti commands as well
       if (command.sm.ts_bgc !== "#ffffff") {
         styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'highlight');
-        styleCommand.highlightColor = command.ts_bgc;
+        styleCommand.highlightColor = command.sm.ts_bgc;
         highlightCommands.push(styleCommand);
       }
     } else if (command.sm.hasOwnProperty('ts_fgc')) {
       //TODO: handle this and send to server
       // styleCommand = new StyleCommand(timeStamp, command.si, command.ei, 'font color change');
-      // styleCommand.fontColor = command.ts_fgc;
+      // styleCommand.fontColor = command.sm.ts_fgc;
     }
     //etc.
     if (styleCommand) {
@@ -301,22 +318,28 @@ function processCommands(command, timeStamp) {
   }
 }
 
-//function called on typing new URL in a tab 
+//PROCESS URL AND PAGE UPDATES
+
+//Function called on typing new URL in a tab 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.url !== undefined) { //if statement prevents commands from firing on refresh or iframe load
+  //If statement prevents commands from firing on refresh or iframe load
+  if (changeInfo.url !== undefined) {
+    //Check for the document ID if it hasn't already been found
     if(documentIdFound === 0) {
       checkURL(sendDocId);
     }
     var updateURLCommand = new UpdateURLCommand(Date.now());
     updateURLCommands.push(updateURLCommand);
     newCommand();
-  } else { //on refresh, make sure to resend the status to content.js
-    sendToContent(status);
+  } else {
+    //On refresh, make sure to resend the status to content.js
+    sendToContent(difficultyStatus);
   }
 });
 
-//on switching tabs
+//Function called on switching tabs
 chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
+  //Check for the document ID if it hasn't already been found
   if(documentIdFound === 0) {
     checkURL(sendDocId);
   }
@@ -325,8 +348,9 @@ chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
   newCommand();
 });
 
-//on creating a tab (calls update and activate also)
+//Function called on creating a tab (calls update and activate also)
 chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
+  //Check for the document ID if it hasn't already been found
   if(documentIdFound === 0) {
     checkURL(sendDocId);
   }
@@ -334,6 +358,22 @@ chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
   createNewTabCommands.push(createNewTabCommand);
   newCommand();
 });
+
+//Function polls every 1000 ms (?) to detect if the Chrome browser is currently in focus
+window.setInterval(checkBrowserFocus, 1000);
+function checkBrowserFocus() {
+  chrome.windows.getCurrent(function(browser) {
+    //Only log an event when a change in focus occurs
+    if (browser.focused != chromeInFocus) {
+      chromeInFocus = browser.focused;
+      var windowFocusCommand = new WindowFocusCommand(Date.now());
+      windowFocusCommands.push(windowFocusCommand);
+      newCommand();
+    }
+  });
+}
+
+//DOCUMENT ID PROCESSING FUNCTIONALITY
 
 //Detects when the user is on a Google Docs tab.
 function checkURL(cb) {
@@ -354,10 +394,10 @@ function checkURL(cb) {
   });
 }
 
+//Sends the document ID to the server
 function sendDocId(docId) {
   if (docId !== null && docId !== undefined) {
     var numericDocId = getNumericValFromDocId(docId);
-    console.log(numericDocId);
     var docIdObject = {
       type: "documentId",
       documentId: numericDocId
@@ -367,6 +407,9 @@ function sendDocId(docId) {
   }
 }
 
+//Maps document ID strings to simple ID numbers
+//Aside from readability, this is also so the ID can be logged 
+//as a timestamp (type long) on the server end
 function getNumericValFromDocId(docId) {
   switch(docId) {
     case  "1utnT3bYBZJf_M3NFb7CBVqpop4pIdR_AnZBo6pcjr8s":
@@ -452,18 +495,4 @@ function getNumericValFromDocId(docId) {
     default:
         return 0;
   }
-}
-
-//to tell when Chrome loses focus
-window.setInterval(checkBrowserFocus, 1000);
-function checkBrowserFocus() {
-  chrome.windows.getCurrent(function(browser) {
-    //only log an event when a change in focus occurs
-    if (browser.focused != chromeInFocus) {
-      chromeInFocus = browser.focused;
-      var windowFocusCommand = new WindowFocusCommand(Date.now());
-      windowFocusCommands.push(windowFocusCommand);
-      newCommand();
-    }
-  });
 }

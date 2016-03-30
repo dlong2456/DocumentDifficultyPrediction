@@ -1,7 +1,6 @@
 //****UI BUTTON CODE****//
-//TODO: Make a "Ask for Help" button
-//TODO: Make a "Comments" text field
-//TODO: Figure out how to pull HTML strings from documents so they are more readable/editable
+
+//TODO: Figure out how to pull HTML strings in code below from files so they are more readable/editable
 
 //Create 'Facing difficulty' button
 var $difficulty_button = $('<div role="button" id="facingDifficulty" class="goog-inline-block jfk-button jfk-button-standard docs-titlebar-button" aria-disabled="false" aria-pressed="false" tabindex="0" aria-label="I am facing difficulty" value="undefined" tabindex="0" style="-webkit-user-select: none;">Facing Difficulty</div>');
@@ -10,7 +9,7 @@ $difficulty_button.prependTo($('.docs-titlebar-buttons'));
 //Create 'Making progress' button
 var $progress_button = $('<div role="button" id="makingProgress" class="goog-inline-block jfk-button jfk-button-standard docs-titlebar-button" aria-disabled="false" aria-pressed="false" tabindex="0" aria-label="I am making progress" value="undefined" style="-webkit-user-select: none;">Making Progress</div>');
 $progress_button.prependTo($('.docs-titlebar-buttons'));
-//formatting
+//Formatting
 $progress_button.addClass('jfk-button-clear-outline');
 
 //Set difficulty status and create status display
@@ -34,11 +33,12 @@ function changeColor() {
 		//Red
 		document.getElementById('status-text').style.color = "#FF0000";
 	} else {
-		//Black
+		//Black (for Pending)
 		document.getElementById('status-text').style.color = "#000000";
 	}
 }
 
+//Refresh the color on page load
 changeColor();
 
 //****BUTTON EVENT LISTENERS****//
@@ -50,16 +50,16 @@ $('#facingDifficulty').click(function() {
 		$('#difficulty-box').hide();
 		$('#docs-docos-caret').hide().removeClass('custom');
 		$('#facingDifficulty').removeClass('jfk-button-checked');
-		//close dropdown menu if it is open
+		//Close dropdown menu if it is open
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
 		$('#difficultyTypeDropdown').hide();
 	//Otherwise, select it and show dialog box
     } else {
-		//formatting
+		//Formatting
 		$('#facingDifficulty').addClass('jfk-button-checked');
 		$('#facingDifficulty').addClass('jfk-button-clear-outline');
-		//open dialog box
+		//Open dialog box
 		$('#docs-docos-caret').show().addClass("custom");
 		$('#difficulty-box').show();
 	}
@@ -74,14 +74,14 @@ $progress_button.click(function() {
 		$('#facingDifficulty').removeClass('jfk-button-checked');
     }
     //If Making Progress is already the status
-	if (statusText == 'Progress') {
+	if (statusText === 'Progress') {
 		// Don't do anything
 	//Otherwise, select it and notify backend
     } else {
-		//tell background.js that the user made a status correction
+		//Tell background.js that the user made a status correction
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", facingDifficulty: 0}, function(response) {
 		});
-		//change status text and color
+		//Change status text and color
 		statusText = 'Progress';
 		$('#status-text').text(statusText);
 		changeColor();
@@ -110,15 +110,15 @@ $('#makingProgress').mouseout(function() {
 //****EVENT HANDLERS FOR BUTTONS IN BOX****//
 
 //Type button
-//TODO: Icon for Type button
+//TODO: Make an icon for the Type button
 $('#typeButton').mouseenter(function() {
-	//formatting
+	//Formatting
 	$('#typeButton').addClass('goog-flat-menu-button-hover');
 	$('#typeButton').addClass('goog-flat-menu-button-focused');
 });
 
 $('#typeButton').mouseleave(function() {
-	//formatting
+	//Formatting
 	$('#typeButton').removeClass('goog-flat-menu-button-hover');
 	$('#typeButton').removeClass('goog-flat-menu-button-focused');
 });
@@ -128,14 +128,14 @@ $('#typeButton').click(function() {
 	if($('#typeButton').hasClass('goog-flat-menu-button-open')) {
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
-		//close dropdown
+		//Close dropdown
 		$('#difficultyTypeDropdown').hide();
-	//otherwise open the dropdown
+	//Otherwise open the dropdown
 	} else {
-		//formatting
+		//Formatting
 		$('#typeButton').addClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'true');
-		//open dropdown
+		//Open dropdown
 		$('#difficultyTypeDropdown').show();
 	}
 });
@@ -147,14 +147,14 @@ $('#typeButton').click(function() {
 //Click events
 $('#spelling').click(function() {
 	if($('#spelling').hasClass('goog-option-selected')) {
-		//do nothing
+		//Do nothing
 	} else {
 		//TODO: edit aria-activedescendent and aria-owns 
 		//Select spelling and unselect other menu options
 		$('#grammar').removeClass('goog-option-selected');
 		$('#content').removeClass('goog-option-selected');
 		$('#spelling').addClass('goog-option-selected');
-		//close dropdown
+		//Close dropdown
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
 		$('#difficultyTypeDropdown').hide();
@@ -163,13 +163,13 @@ $('#spelling').click(function() {
 
 $('#grammar').click(function() {
 	if($('#grammar').hasClass('goog-option-selected')) {
-		//do nothing
+		//Do nothing
 	} else {
 		//Select grammar and unselect other menu options
 		$('#spelling').removeClass('goog-option-selected');
 		$('#content').removeClass('goog-option-selected');
 		$('#grammar').addClass('goog-option-selected');
-		//close dropdown
+		//Close dropdown
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
 		$('#difficultyTypeDropdown').hide();
@@ -178,13 +178,13 @@ $('#grammar').click(function() {
 
 $('#content').click(function() {
 	if($('#content').hasClass('goog-option-selected')) {
-		//do nothing
+		//Do nothing
 	} else {
 		//Select content and unselect other menu options
 		$('#grammar').removeClass('goog-option-selected');
 		$('#spelling').removeClass('goog-option-selected');
 		$('#content').addClass('goog-option-selected');
-		//close dropdown
+		//Close dropdown
 		$('#typeButton').removeClass('goog-flat-menu-button-open');
 		document.getElementById('typeButton').setAttribute('aria-expanded', 'false');
 		$('#difficultyTypeDropdown').hide();
@@ -192,11 +192,11 @@ $('#content').click(function() {
 });
 
 $('#submit').click(function() {
-	//change status text and color
+	//Change status text and color
 	statusText = 'Slow progress';
 	$('#status-text').text(statusText);
 	changeColor();
-	//get info about difficulty type and details
+	//Get info about difficulty type and details
 	var type;
 	if ($('#grammar').hasClass('goog-option-selected')) {
 		type = 'grammar';
@@ -205,7 +205,7 @@ $('#submit').click(function() {
 	} else if ($("#content").hasClass('goog-option-selected')) {
 		type = 'content';
 	}
-	//tell background.js that the user made a status correction
+	//Tell background.js that the user made a status correction
 	chrome.runtime.sendMessage({timestamp: Date.now(), type: "statusUpdate", difficultyType: type, details: $('#status-content').val(), facingDifficulty: 1}, function(response) {
 	});
 });
@@ -241,15 +241,15 @@ $('#content').mouseleave(function() {
 document.addEventListener("click",
   function(event) {
 	if (event.target.getAttribute('id') === "docs-spellcheckslidingdialog-button-change") {
-		//send message to background.js
+		//Send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spellcheck_change"}, function(response) {
 		});
 	} else if (event.target.getAttribute('id') === "docs-spellcheckslidingdialog-button-dictionary") {
-		//send message to background.js
+		//Send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spellcheck_dictionary"}, function(response) {
 		});
 	} else if (event.target.getAttribute('id') === "docs-spellcheckslidingdialog-button-ignore") {
-		//send message to background.js
+		//Send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "spellcheck_ignore"}, function(response) {
 		});
 	}
@@ -258,22 +258,22 @@ document.addEventListener("click",
 
 //****PAGE SCROLL AND OTHER LISTENERS****//
 
-//function that is called on scroll events
+//Function that is called on scroll events
 function onScroll(event) {
 	if (event.srcElement.attributes[0].nodeValue === "kix-appview-editor") {
-		//send message to background.js
+		//Send message to background.js
 		chrome.runtime.sendMessage({timestamp: Date.now(), type: "scroll"}, function(response) {
 		});
 	}
 }
 
-//generate a new version of onScroll using underscore.js's throttle function
-//throttle ensures that onScroll is only called once every 2000 milliseconds (2s) 
-//ordinarily, scroll events fire really rapidly in succession and we don't want them to skew the command aggregation
-//for more documentation, see underscorejs.org
+//Generate a new version of onScroll using underscore.js's throttle function
+//Throttle ensures that onScroll is only called once every 2000 milliseconds (2s)
+//Ordinarily, scroll events fire really rapidly in succession and we don't want them to skew the command aggregation
+//For more documentation, see underscorejs.org
 var throttled = _.throttle(onScroll, 2000, {trailing: false});
 
-//attach the new "throttled" function to the scroll event listener 
+//Attach the new "throttled" function to the scroll event listener 
 window.addEventListener('scroll', throttled, true);
 
 //---Code below can listen to mouse moves. Disabled for now.--- 
@@ -293,10 +293,9 @@ window.addEventListener('scroll', throttled, true);
 
 //***MESSAGE HANDLING CODE***//
 
-//receive messages from background.js
+//Receive messages from background.js
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		console.log('receiving status' + request.message);
 		if (request.message === '1') {
 			statusText = 'Slow progress';
 			$('#status-text').text(statusText);
