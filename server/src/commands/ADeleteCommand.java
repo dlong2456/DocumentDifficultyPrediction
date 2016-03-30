@@ -1,5 +1,6 @@
 package commands;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
@@ -32,13 +33,15 @@ public class ADeleteCommand extends AbstractCommand implements DeleteCommand {
 	@Override
 	public void dump() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public Map<String, String> getAttributesMap() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, String> attrMap = new HashMap<String, String>();
+		attrMap.put("startIndex", Integer.toString(startIndex));
+		attrMap.put("endIndex", Integer.toString(endIndex));
+		return attrMap;
 	}
 
 	@Override

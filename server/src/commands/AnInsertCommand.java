@@ -1,5 +1,6 @@
 package commands;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
@@ -47,8 +48,10 @@ public class AnInsertCommand extends AbstractCommand implements InsertCommand {
 
 	@Override
 	public Map<String, String> getAttributesMap() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, String> attrMap = new HashMap<String, String>();
+		attrMap.put("index", Integer.toString(index));
+		attrMap.put("content", content);
+		return attrMap;
 	}
 
 	@Override

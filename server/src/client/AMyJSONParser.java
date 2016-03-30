@@ -34,7 +34,6 @@ public class AMyJSONParser implements MyJSONParser {
 
 	public Object parse(String jsonString) {
 		JSONObject obj = new JSONObject(jsonString);
-		System.out.println(jsonString);
 		if (obj.has("type")) {
 			if (obj.get("type").equals("command")) {
 				parseCommand(obj);
@@ -42,7 +41,10 @@ public class AMyJSONParser implements MyJSONParser {
 				predictionManager.handleStatusUpdate(obj);
 			} else if (obj.get("type").equals("documentId")) {
 				long longId = obj.getLong("documentId");
+				String docIdString = obj.getString("documentIdString");
 				ICommand idCommand = new ADocumentIdCommand();
+				((ADocumentIdCommand) idCommand).setDocumentIdLong(longId);
+				((ADocumentIdCommand) idCommand).setDocumentIdString(docIdString);
 				idCommand.setTimestamp(longId);
 				predictionManager.setDocumentId(longId);
 				predictionManager.processEvent(idCommand);

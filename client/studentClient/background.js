@@ -400,7 +400,8 @@ function sendDocId(docId) {
     var numericDocId = getNumericValFromDocId(docId);
     var docIdObject = {
       type: "documentId",
-      documentId: numericDocId
+      documentId: numericDocId,
+      documentIdString: docId
     };
     //Send Document ID to server
     ws.send(JSON.stringify(docIdObject));

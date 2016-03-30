@@ -1,5 +1,6 @@
 package commands;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
@@ -37,13 +38,14 @@ public abstract class AStyleCommand extends AbstractCommand implements StyleComm
 
 	@Override
 	public Map<String, String> getAttributesMap() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, String> attrMap = new HashMap<String, String>();
+		attrMap.put("startIndex", Integer.toString(startIndex));
+		attrMap.put("endIndex", Integer.toString(endIndex));
+		return attrMap;
 	}
 
 	@Override
 	public Map<String, String> getDataMap() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

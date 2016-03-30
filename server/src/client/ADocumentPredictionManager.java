@@ -17,26 +17,26 @@ import javax.mail.internet.MimeMessage;
 import org.json.JSONObject;
 
 import analyzer.ui.APredictionController;
+import commands.DocumentStatusCorrection;
 import config.FactorySingletonInitializer;
 import difficultyPrediction.APredictionParameters;
 import difficultyPrediction.DifficultyPredictionSettings;
 import difficultyPrediction.DifficultyRobot;
 import difficultyPrediction.metrics.CommandClassificationSchemeName;
-import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand;
 import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand.Status;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
 
 public class ADocumentPredictionManager implements DocumentPredictionManager {
-	private static int currentStatus; // 1 for making progress, 0 for facing
+	private static int currentStatus; // 0 for making progress, 1 for facing
 										// difficulty
 	private static Socket client;
-	private long documentId; 
+	private long documentId;
 
 	public static void main(String[] args) {
 		System.out.println("Client created");
 		DocumentPredictionManager predictionManager = new ADocumentPredictionManager();
-		// The port number is passed as an argument when the process is run
+		// The port number is passed as an argument to main when the process is run
 		int port = Integer.parseInt(args[0]);
 		try {
 			client = new Socket("localhost", port);
@@ -49,7 +49,6 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	}
 
 	public ADocumentPredictionManager() {
-		System.out.println("creating event recorder, etc");
 		APredictionParameters.getInstance().setCommandClassificationScheme(CommandClassificationSchemeName.A5);
 		APredictionParameters.getInstance().setStartupLag(0);
 		APredictionParameters.getInstance().setSegmentLength(5);
@@ -57,9 +56,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		FactorySingletonInitializer.configure();
 		EventRecorder.getInstance().initCommands();
 		DifficultyRobot.getInstance().addStatusListener(this);
-		APredictionController.createUI();
-//		DifficultyPredictionSettings.setSegmentLength(5);
-//		DifficultyPredictionSettings.set
+//		APredictionController.createUI();
 	}
 
 	public void processEvent(ICommand event) {
@@ -68,24 +65,21 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 
 	@Override
 	public void newStatus(String aStatus) {
-		System.out.println("NEW STATUS STRING: " + currentStatus);
-
 		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void newAggregatedStatus(String aStatus) {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void newStatus(int aStatus) {
-
+		// TODO Auto-generated method stub
 	}
 
 	public void handleStatusUpdate(JSONObject obj) {
 		int newStatus = obj.getInt("facingDifficulty");
-		System.out.println("new status: " + newStatus);
-		System.out.println("Old status: " + currentStatus);
 		if (newStatus != currentStatus) {
 			currentStatus = newStatus;
 			Status status;
@@ -94,16 +88,21 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 			} else {
 				status = Status.Insurmountable;
 			}
-			ICommand statusCommand = new DifficulyStatusCommand(status);
-			System.out.println("sending command to eventrecorder");
-			processEvent(statusCommand);
-			// If student is struggling, then send an email to notify the
-			// teacher.
-			System.out.println("Current Status: " + currentStatus);
-			if (currentStatus == 1) {
-				System.out.println("sending an email");
+			ICommand statusCommand = new DocumentStatusCorrection(status);
+			statusCommand.setTimestamp(obj.getLong("timestamp"));
+			// If student is struggling
+			if (newStatus == 1) {
+				// Send email to notify the teacher
 				sendEmail();
+				// And log extra details about the status update
+				System.out.println("details: " + obj.getString("details"));
+				((DocumentStatusCorrection) statusCommand).setDetails(obj.getString("details"));
+				System.out.println("difficulty type: " + obj.getString("difficultyType"));
+				((DocumentStatusCorrection) statusCommand).setType(obj.getString("difficultyType"));
 			}
+			// Send command to EventRecorder
+			processEvent(statusCommand);
+			System.out.println("Event sent");
 		}
 	}
 
@@ -127,11 +126,11 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	public long getDocumentId() {
 		return documentId;
 	}
-	
+
 	public void setDocumentId(long newId) {
 		documentId = newId;
 	}

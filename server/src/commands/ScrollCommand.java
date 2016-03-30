@@ -20,7 +20,6 @@ public class ScrollCommand extends AbstractCommand {
 	@Override
 	public void dump() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

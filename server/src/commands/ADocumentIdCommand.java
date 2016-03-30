@@ -1,5 +1,6 @@
 package commands;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ui.IEditorPart;
@@ -12,6 +13,7 @@ public class ADocumentIdCommand extends AbstractCommand {
 
 	private long timestamp;
 	private String documentId;
+	private long documentIdNumber;
 
 	@Override
 	public void setTimestamp(long newTimestamp) {
@@ -26,8 +28,10 @@ public class ADocumentIdCommand extends AbstractCommand {
 
 	@Override
 	public Map<String, String> getAttributesMap() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, String> attrMap = new HashMap<String, String>();
+		attrMap.put("documentID", documentId);
+		attrMap.put("documentIdNumber", Long.toString(documentIdNumber));
+		return attrMap;
 	}
 
 	@Override
@@ -77,6 +81,22 @@ public class ADocumentIdCommand extends AbstractCommand {
 	public boolean execute(IEditorPart target) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void setDocumentIdLong(long docId) {
+		documentIdNumber = docId;
+	}
+
+	public void setDocumentIdString(String docId) {
+		documentId = docId;
+	}
+
+	public long getDocumentIdLong() {
+		return documentIdNumber;
+	}
+
+	public String getDocumentIdString() {
+		return documentId;
 	}
 
 }
