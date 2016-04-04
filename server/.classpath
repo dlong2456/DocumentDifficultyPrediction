@@ -22,5 +22,12 @@
 	<classpathentry kind="lib" path="/Users/Duri/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/Users/Duri/javax.mail.jar"/>
 	<classpathentry kind="lib" path="/Users/Duri/jaf-1.1.1/activation.jar"/>
+	<classpathentry kind="lib" path="/Users/Duri/Downloads/swt-4.5-gtk-linux-x86_64/swt-debug.jar"/>
+	<classpathentry kind="lib" path="/Users/Duri/Downloads/swt-4.5-gtk-linux-x86_64/swt.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="org.eclipse.swt"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

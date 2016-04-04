@@ -4,12 +4,15 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
+import bus.uigen.ObjectEditor;
 import server.AMyWebSocket;
 
 public class Driver {
 
-	public static void main(String[] args) throws Exception {
-		Server server = new Server(8080);
+	public static void main(String[] args) {
+		// Open a Jetty Websocket for the client to connect to
+		Server server = new Server(5050); // 8080 for localhost, 5050 for CS
+											// server
 		WebSocketHandler wsHandler = new WebSocketHandler() {
 			@Override
 			public void configure(WebSocketServletFactory factory) {
@@ -17,7 +20,12 @@ public class Driver {
 			}
 		};
 		server.setHandler(wsHandler);
-		server.start();
-		server.join();
+		ObjectEditor.edit("Hello world");
+		try {
+			server.start();
+			server.join();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

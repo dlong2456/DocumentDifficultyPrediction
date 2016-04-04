@@ -1,12 +1,11 @@
 package server;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-public class AServerMessageReceiver extends Thread {
+public class AServerMessageReceiver extends Thread implements ServerMessageReceiver {
 
 	private Socket server;
 	private MyWebSocket webSocket;
@@ -21,10 +20,15 @@ public class AServerMessageReceiver extends Thread {
 	public void run() {
 		while (running) {
 			try {
+				// Read input to see if there is a message from the client
+				// process
 				DataInputStream in = new DataInputStream(server.getInputStream());
 				String command = in.readUTF();
-				//this is a new status
-				System.out.println("STATUS MESSAGE SENDING FROM SERVER");
+				// Currently, command will either be a new status from
+				// EclipseHelper or a 'connected' message (indicating that the
+				// client process has created its message receiver)
+				System.out.println("Sending message from server to web");
+				//Once we receive a command, send it to the web client
 				webSocket.sendMessage(command);
 			} catch (SocketTimeoutException s) {
 				System.out.println("Socket timed out!");
@@ -36,8 +40,9 @@ public class AServerMessageReceiver extends Thread {
 		}
 	}
 	
+	//This method terminates the running thread
 	public void terminate() {
-		System.out.println("server message receiver terminating");
+		System.out.println("Server message receiver terminating");
 		running = false;
 		this.interrupt();
 	}

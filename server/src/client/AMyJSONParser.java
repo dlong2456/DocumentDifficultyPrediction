@@ -4,11 +4,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import commands.ADocumentCursorMoveCommand;
+import commands.ADocumentDeleteCommand;
 import commands.ADocumentIdCommand;
+import commands.ADocumentInsertCommand;
+import commands.ADocumentLargeDeleteCommand;
+import commands.ADocumentLargeInsertCommand;
+import commands.ADocumentSpellcheckCommand;
 import commands.AWindowFocusCommand;
 import commands.BoldCommand;
 import commands.CollaborationCommand;
 import commands.CreateNewTabCommand;
+import commands.DocumentDeleteCommand;
+import commands.DocumentInsertCommand;
 import commands.HighlightCommand;
 import commands.ItalicizeCommand;
 import commands.ScrollCommand;
@@ -16,14 +23,7 @@ import commands.StyleCommand;
 import commands.SwitchTabsCommand;
 import commands.UnderlineCommand;
 import commands.UpdateURLCommand;
-import edu.cmu.scs.fluorite.commands.ADocumentDeleteCommand;
-import edu.cmu.scs.fluorite.commands.ADocumentInsertCommand;
-import edu.cmu.scs.fluorite.commands.ADocumentLargeDeleteCommand;
-import edu.cmu.scs.fluorite.commands.ADocumentLargeInsertCommand;
-import edu.cmu.scs.fluorite.commands.DocumentDeleteCommand;
 import edu.cmu.scs.fluorite.commands.ICommand;
-import edu.cmu.scs.fluorite.commands.DocumentInsertCommand;
-import edu.cmu.scs.fluorite.commands.ADocumentSpellcheckCommand;
 
 public class AMyJSONParser implements MyJSONParser {
 

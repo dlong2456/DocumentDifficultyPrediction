@@ -15,18 +15,17 @@ public class StdOutPrinter extends Thread {
 
 	public void run() {
 		while (true) {
-			// Read the output from proc2
 			String s = null;
 			try {
+				// Read stdIn (so we can see the output of a forked process)
 				while ((s = stdInput.readLine()) != null) {
 					System.out.println(s);
 				}
-				// Read any errors from proc2
+				// Read stdError (so we can see the errors of a forked process)
 				while ((s = stdError.readLine()) != null) {
 					System.out.println("ERROR:" + s);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

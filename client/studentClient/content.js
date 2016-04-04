@@ -293,7 +293,8 @@ window.addEventListener('scroll', throttled, true);
 
 var cursorLeft;
 var cursorTop;
-//function that is called on cursor events
+//Function that is called on cursor move events. Every time a user clicks, this function determines whether the cursor moved.
+//TODO: A limitation is that this does not incorporate cursor movement via arrow keys - this functionality could probably be added with a key listener
 document.addEventListener('click', function() {
 	var element = document.getElementsByClassName('kix-cursor docs-ui-unprintable')[0];
     var style = window.getComputedStyle(element);

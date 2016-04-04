@@ -14,6 +14,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import analyzer.ui.APredictionController;
@@ -35,12 +36,19 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 
 	public static void main(String[] args) {
 		System.out.println("Client created");
+		// Create a new PredictionManager
 		DocumentPredictionManager predictionManager = new ADocumentPredictionManager();
-		// The port number is passed as an argument to main when the process is run
+		// The port number is passed as an argument to main when the process is
+		// run
 		int port = Integer.parseInt(args[0]);
 		try {
-			client = new Socket("localhost", port);
+			// localhost when running in Eclipse, classroom.cs.unc.edu or
+			// 152.2.130.35 when running on CS server
+			client = new Socket("152.2.130.35", port);
+			// client = new Socket("localhost", port);
 			System.out.println("Client connected to " + client.getRemoteSocketAddress());
+			// Create a new client message receiver to receive messages from
+			// server
 			Thread messageReceiver = new AClientMessageReceiver(client, predictionManager);
 			messageReceiver.start();
 		} catch (IOException e) {
@@ -49,14 +57,26 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	}
 
 	public ADocumentPredictionManager() {
+		// Set prediction parameters within EclipseHelper
+		// CommandClassificationSchemeName.A4 is also designed to work with
+		// documentss
 		APredictionParameters.getInstance().setCommandClassificationScheme(CommandClassificationSchemeName.A5);
-		APredictionParameters.getInstance().setStartupLag(0);
-		APredictionParameters.getInstance().setSegmentLength(5);
+		// Set startup lag and segment length - they are short because the user
+		// study we originally tested this on was only a two page paper
+		APredictionParameters.getInstance().setStartupLag(5);
+		APredictionParameters.getInstance().setSegmentLength(10);
+		// TODO: What does replay mode do again?
 		DifficultyPredictionSettings.setReplayMode(true);
 		FactorySingletonInitializer.configure();
+		// Start EventRecorder
 		EventRecorder.getInstance().initCommands();
+		// Add ourselves as a status listener so we can receive predictions
 		DifficultyRobot.getInstance().addStatusListener(this);
-		APredictionController.createUI();
+		// Enable this when debugging or analyzing on a local server - we can
+		// visualize the commands and predictions being made
+		// Disable this when running on CS server because it causes the program
+		// to fail
+		// APredictionController.createUI();
 	}
 
 	public void processEvent(ICommand event) {
@@ -73,19 +93,23 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		// TODO Auto-generated method stub
 	}
 
+	// Right now, we are listening to statuses rather than aggregated statuses
+	// since difficulties are hard to trigger in a 2 page document
+	// This method listens to automatic status predictions from EclipseHelper
 	@Override
 	public void newStatus(int aStatus) {
-		currentStatus = aStatus;
-		System.out.println("NEW STATUS: " + currentStatus);
 		// If student is struggling, then send an email to notify the
 		// teacher.
-		if (aStatus != currentStatus && currentStatus == 1) {
+		if (aStatus != currentStatus && aStatus == 1) {
 			sendEmail();
 		}
+		currentStatus = aStatus;
+		System.out.println("NEW STATUS: " + currentStatus);
 		// Send the prediction to be displayed to the student.
 		sendMessageToServer("{ status: '" + currentStatus + "'}");
 	}
 
+	// This method handles when a user corrects their status manually
 	public void handleStatusUpdate(JSONObject obj) {
 		int newStatus = obj.getInt("facingDifficulty");
 		if (newStatus != currentStatus) {
@@ -99,30 +123,30 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 			ICommand statusCommand = new DocumentStatusCorrection(status);
 			// If student is struggling
 			if (newStatus == 1) {
-				// And log extra details about the status update
-				((DocumentStatusCorrection) statusCommand).setDetails(obj.getString("details"));
-				((DocumentStatusCorrection) statusCommand).setType(obj.getString("difficultyType"));
-				// Send email to notify the teacher
-				sendEmail();
+				try {
+					// If the student has entered details and difficulty type,
+					// then add these to the command object
+					((DocumentStatusCorrection) statusCommand).setDetails(obj.getString("details"));
+					((DocumentStatusCorrection) statusCommand).setType(obj.getString("difficultyType"));
+					// Send email to notify the teacher
+					sendEmail();
+				} catch (JSONException e) {
+					// This exception will be thrown if the student has not
+					// entered details and difficulty type.
+					// We still want to send an email to notify the teacher
+					sendEmail();
+				}
 			}
 			// Send command to EventRecorder
 			processEvent(statusCommand);
 		}
 	}
 
-	// Listens to status events. When a status is received, this updates the
-	// currentStatus and sends the status to the server
+	// Listens to aggregate status events. Not using this at the moment - maybe
+	// for longer papers.
 	@Override
 	public void newAggregatedStatus(int aStatus) {
-//		currentStatus = aStatus;
-//		System.out.println("NEW AGGREGATED STATUS: " + currentStatus);
-//		// If student is struggling, then send an email to notify the
-//		// teacher.
-//		if (aStatus != currentStatus && currentStatus == 1) {
-//			sendEmail();
-//		}
-//		// Send the prediction to be displayed to the student.
-//		sendMessageToServer("{ status: '" + currentStatus + "'}");
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -155,10 +179,10 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	}
 
 	private void sendEmail() {
-		// Recipient's email ID needs to be mentioned.
+		// Recipient's email ID needs to be specified
 		String to = "documenthelper1@gmail.com";
 
-		// Sender's email ID needs to be mentioned
+		// Sender's email ID needs to be specified
 		String from = "documenthelper1@gmail.com";
 
 		// Get system properties
@@ -166,11 +190,13 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		properties.put("mail.smtp.auth", "true");
 		properties.put("mail.smtp.starttls.enable", "true");
 		properties.put("mail.smtp.host", "smtp.gmail.com");
-		properties.put("mail.smtp.port", "587");
+		properties.put("mail.smtp.port", "587"); // 587 is the gmail port number
 
+		// This only works for gmail accounts without two way authentication
+		// enabled
 		Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("documenthelper1@gmail.com", "");
+				return new PasswordAuthentication("documenthelper1@gmail.com", "MixedFocus");
 			}
 		});
 
@@ -198,6 +224,8 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 
 	}
 
+	// This method sends a message to the server (which will then send it to the
+	// web client)
 	public void sendMessageToServer(String message) {
 		OutputStream outToServer;
 		try {
@@ -205,7 +233,6 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 			DataOutputStream out = new DataOutputStream(outToServer);
 			out.writeUTF(message);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

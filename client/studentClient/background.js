@@ -17,7 +17,10 @@ var cursorCommands = [];
 var numberOfCommands = 0;
 var chromeInFocus = 1;
 var documentId;
+//This variable is updated when the user first visits a Google Doc after connecting
 var documentIdFound = 0;
+//This variable is updated when the server is connected and has all messaging systems running
+var connected = 0;
 //Initialize status to pending so it will show up on Google Doc 
 var difficultyStatus = 'pending';
 //This is the number of commands we will send in each package to the server
@@ -74,8 +77,10 @@ var docIDList = [
 // Sending message to content.js
 sendToContent = function(message) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {message: message}, function(response) {
-    });
+      if (typeof tabs !== 'undefined' && tabs.length > 0) {
+        chrome.tabs.sendMessage(tabs[0].id, {message: message}, function(response) {
+        });
+      }
   });
 };
 
@@ -107,33 +112,44 @@ chrome.runtime.onMessage.addListener(function(request) {
   }
 });
 
-//Web socket functionality
-var ws = new WebSocket("ws://127.0.0.1:8080/");
-// var ws = new WebSocket("ws://classroom1.cs.unc.edu:5050/");
+//Web socket functionality 
+start("ws://classroom1.cs.unc.edu:5050");
+// start("ws://127.0.0.1:8080/");
 
-ws.onopen = function() {
-};
+function start(websocketServerLocation){
+  ws = new WebSocket(websocketServerLocation);
+  ws.onopen = function() {
+  };
 
-ws.onmessage = function (evt) {
-    var data = evt.data;
-    var json = JSON.stringify(eval("(" + data + ")"));
-    var jsonData = JSON.parse(json);
-    if (jsonData.hasOwnProperty("status")) {
-      difficultyStatus = jsonData.status;
-      sendToContent(jsonData.status);
-    }
-};
+  ws.onmessage = function (evt) {
+      var data = evt.data;
+      if (data === "Connected") {
+        connected = 1;
+      } else {
+        var json = JSON.stringify(eval("(" + data + ")"));
+        var jsonData = JSON.parse(json);
+        if (jsonData.hasOwnProperty("status")) {
+          difficultyStatus = jsonData.status;
+          sendToContent(jsonData.status);
+        }
+      }
+  };
 
-ws.onclose = function() {
-  //Change status back to pending since socket is closing
-  difficultyStatus = 'pending';
-  //Notify content.js that the socket has closed
-  sendToContent("close");
-};
+  ws.onclose = function() {
+    //Change status back to pending since socket is closing
+    difficultyStatus = 'pending';
+    //Notify content.js that the socket has closed
+    sendToContent("close");
+    //try to reconnect in 5 seconds
+    setTimeout(function() {
+      start(websocketServerLocation);
+    }, 5000);
+  };
 
-ws.onerror = function(err) {
-  console.log(err);
-};
+  ws.onerror = function(err) {
+    console.log(err);
+  };
+}
 
 //This prepares commands and sends them in bundles to the server
 function newCommand() {
@@ -247,7 +263,7 @@ chrome.webRequest.onBeforeRequest.addListener(
         };
         //This is a hack so that we only listen to edit commands on the Google Doc we are interested in
         //I think there is a better way to do this but this was the quickest fix
-        if (documentIdFound === 1) {
+        if (documentIdFound === 1 && connected === 1) {
           checkURL(function(docId) {
             if(docId === documentId) {
               parseData(data);
@@ -256,7 +272,6 @@ chrome.webRequest.onBeforeRequest.addListener(
         }
       } else if (request.url.indexOf('/sync?') != -1) {
         //this is a suggested revision or a comment
-        console.log("CollaborationCommand");
         var collaborationCommand = new CollaborationCommand(Date.now());
         collaborationCommands.push(collaborationCommand);
         newCommand();
@@ -337,23 +352,23 @@ function processCommands(command, timeStamp) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   //If statement prevents commands from firing on refresh or iframe load
   if (changeInfo.url !== undefined) {
-    //Check for the document ID if it hasn't already been found
-    if(documentIdFound === 0) {
-      checkURL(sendDocId);
-    }
     var updateURLCommand = new UpdateURLCommand(Date.now());
     updateURLCommands.push(updateURLCommand);
     newCommand();
   } else {
     //On refresh, make sure to resend the status to content.js
     sendToContent(difficultyStatus);
+    //Check for the document ID if it hasn't already been found
+    if(documentIdFound === 0 && connected === 1) {
+      checkURL(sendDocId);
+    }
   }
 });
 
 //Function called on switching tabs
 chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
   //Check for the document ID if it hasn't already been found
-  if(documentIdFound === 0) {
+  if(documentIdFound === 0 && connected === 1) {
     checkURL(sendDocId);
   }
   var switchTabCommand = new SwitchTabCommand(Date.now());
@@ -364,7 +379,7 @@ chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
 //Function called on creating a tab (calls update and activate also)
 chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
   //Check for the document ID if it hasn't already been found
-  if(documentIdFound === 0) {
+  if(documentIdFound === 0 && connected === 1) {
     checkURL(sendDocId);
   }
   var createNewTabCommand = new CreateNewTabCommand(Date.now());

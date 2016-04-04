@@ -23,4 +23,6 @@ public interface MyWebSocket {
 	public Session getSession();
 
 	public void sendMessage(String message);
+	
+	public AServer getServer();
 }

@@ -10,22 +10,21 @@ public class AClientMessageReceiver extends Thread {
 
 	private Socket client;
 	private DocumentPredictionManager predictionManager;
-	private boolean running = true;
 
 	public AClientMessageReceiver(Socket newSocket, DocumentPredictionManager predictionManager) {
 		System.out.println("Client receiver created");
 		client = newSocket;
 		this.predictionManager = predictionManager;
+		this.predictionManager.sendMessageToServer("Connected");
 	}
 
 	public void run() {
-		while (running) {
+		while (true) {
 			try {
 				InputStream inFromServer = client.getInputStream();
 				DataInputStream in = new DataInputStream(inFromServer);
 				String command = in.readUTF();
 				if (command.equals("EXIT")) {
-					running = false;
 					System.out.println("Client exiting");
 					//close the socket
 					client.close();
@@ -43,6 +42,9 @@ public class AClientMessageReceiver extends Thread {
 				e.printStackTrace();
 				System.out.println("Client exiting");
 				System.exit(0);
+			} catch (Throwable e) {
+				System.out.println("bad error occured: " + e.getStackTrace());
+				e.printStackTrace();
 			}
 		}
 	}

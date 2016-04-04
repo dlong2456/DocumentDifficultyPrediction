@@ -6,6 +6,9 @@
     "scripts": ["client/studentClient/background.js"],
     "persistent": true
   },
+  "icons": { "16": "document-16.png",
+           "48": "document-48.png",
+          "128": "document-128.png" },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "permissions": [
     "webRequest",
