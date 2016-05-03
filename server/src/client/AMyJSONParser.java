@@ -55,6 +55,7 @@ public class AMyJSONParser implements MyJSONParser {
 	}
 
 	private void parseCommand(JSONObject obj) {
+		predictionManager.sendMessageToServer(obj.toString());
 		JSONObject insertCommandObject;
 		JSONObject deleteCommandObject;
 		JSONObject boldCommandObject;

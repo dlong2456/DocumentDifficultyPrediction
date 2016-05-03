@@ -30,46 +30,9 @@ var commandPackageSize = 10;
 //This method of recording docIDs will need to be modified if this project is expanded
 //Might look into Google Docs API but this was the quickest fix
 var docIDList = [
-"1utnT3bYBZJf_M3NFb7CBVqpop4pIdR_AnZBo6pcjr8s",
-"1cEe3hOc6hOQZbYrL1ojlIIPWqChNTIaP-rxDOhqVY4o",
-"1znDjpT1DmRL5d55UK9GXhoicymICt7CE7lBmpyeEE-Y",
-"16_j0WNLvvVlSUG0LcSCc_PRbmN0X8SpNUAI5gQ6DyiI",
-"1PsNChRRfgorPLDNCls8n3IYGu0bq0aCQ2vK7hCOqmNA",
-"1ZtHqc9NGtQ55E38xCzZBBCvNgAz2nWwrhvdf6-2eqPg",
-"1R_42ciqJGjKPYLK8NX8VA2qnbw-LUSqjEnWjv-KtjG4",
-"1YSSmozS3A-RBxzR-dQBgiz5dq4B0a1f9d8Kgunt0dmw",
-"1_DqsfW4_v_SeNZpNRYRDnYnEDVwnRLPmbw9MIWvDkIk",
-"1Zb55vT7OU27w9vPZdYNIbyBVbrsLuCSnnLsAG9nAsmA",
-"1F7Oz6IVRmHgPKV1PvWkHlChtcaYS4J_XDT-CfzbBicw",
-"173XESj7nTT3AtWOzR93BC-md5kDWalNED7hGC6MSrkg",
-"1sqsPUagt8R_luTV6BXGRu51_d08T3Oh-dipgsVNE9dc",
-"1jWTEgxOhUBkQx4qBd6Z91i6yib1R6mzfT3a_cOroUo4",
-"10a6Kh-E5F2FnKew-I47bHTvIKdvC0EiCCyrcd2AUuEk",
-"11vxDHg7KKZYjIi69jdlgEFXrcdNOUqmAoyoxIJCaDJY",
-"1eCScFpbcEeqtJUyyy63boQ2AOIzfSP9XmXVkfMFiu7g",
-"1ZXOHpZ8ez0m6efKIZ5M7li2mieQUrs4jsnx9JQm_AxY",
-"1Obo7N7IPu2-muLJ43TjvAPy7v23W5LvFdMG1N-E-tzE",
-"1FHM0P74zOzqiMSgghiMeb5mIDhjWj3z9qlK_K2k8C98",
-"1aR6K2ld_Hn3fGq6wOaOQTp_vmvPlekhisGSxLOu9DkE",
-"1t68zyyf6VWgkzWo50TO_yEzN_FUE56EO_3JlT7zz3Q0",
-"1DSlcBm_NYHSZmmGWqk43xwex_Yo8M72M1VZ9ejMDCY0",
-"1fc4WLpuRFP4fP6uwr0JmIYat9eFfR6lZJ3lHz-0steA",
-"15z4a9HvKUYps56MARXffWTlVMFzcaVlP5vwLRvapEWM",
-"1CEE4iEuw-6liGOrCOrv9cT68LigNoJDeIsqDYYVtjU0",
-"1QykAhwwRunhp6QPEhaHSfxtqSAq0J7sdwiaf5JH5its",
-"1kWQCeaWIRRsqbApb3zLrZm0qCRWqfDk48ewaIVUVnmw",
-"1bQKmqyxqHweOanrgABlNUzUcVvyTMrNsaKrrC5g4YaU",
-"1GWPnhLkICgXJYpFxyOFtxFquJgFLJ1WhnqKtSMUJ9Hs",
-"1_0wSnzPhcZ6Pwd-elcnu-3i2c8VAPdNizSZdKX6yirE",
-"1rxLuEdpFa1oIcvK3_YEiRfmC-AwwDsFXlrbf_s00O5Q",
-"1ZMe6OhGZfsJWhJ3bHucyMICjBy9icvCaCzPJs3ofcYk",
-"1xZONI7xDlb9qdltAdah6p9Ig3PLhOrOX9GtDUU_Mbu4",
-"1hVrQjxkcoOkEnDGoclnXymjKizjiWyR6E_P5Py_H7R0",
-"1XEyyogKV7lcNUuckPXnP6zKhhmg2zbA30suP7tb4WRk",
-"1FSk_Coa86sSxN9LT4rpq4pCUtUjZKbv4_og6rLTWVMg",
-"1AM11GlDR899B_1Skmz0s0D7sak-X_b7FVnu1l2PiEHk",
-"1nMgO_pEiwpiqPoAOoendaqzu-cwmYW3QOQ9rpKFCQeM",
-"15ZFb-5JC97-svNGSN9XhYnxoIrbFBIT0ntmMKCFfkgw"
+"10eVBvPyYNHGE_xOOoIGfKYkIIrDpg9tUfn8FuSyVKIA",
+"1bYdF4RyvYVso2DG8MUMJI_DS-SdCJf3SBE5kbuNdtsM",
+"1iCHQpzQQJmhA67N8kKT4ry4m4wpyUShfD98h_LcxjjM"
 ];
 
 //MESSAGE PASSING
@@ -88,9 +51,15 @@ sendToContent = function(message) {
 chrome.runtime.onMessage.addListener(function(request) {
   //Spellcheck commands
   if(request.type === "spellcheck_change" || request.type === "spellcheck_ignore" || request.type === "spellcheck_dictionary") {
-    var spellcheckCommand = new SpellcheckCommand(request.timestamp, request.type);
-    spellcheckCommands.push(spellcheckCommand);
-    newCommand();
+    if (documentIdFound === 1 && connected === 1) {
+        checkURL(function(docId) {
+          if(docId === documentId) {
+            var spellcheckCommand = new SpellcheckCommand(request.timestamp, request.type);
+            spellcheckCommands.push(spellcheckCommand);
+            newCommand();
+          }
+        });
+      }
   //Status updates
   } else if (request.type === "statusUpdate") {
       var statusUpdateObject = {
@@ -102,21 +71,33 @@ chrome.runtime.onMessage.addListener(function(request) {
       ws.send(JSON.stringify(statusUpdateObject));
   //Scroll commands
   } else if (request.type === "scroll") {
-      var scrollCommand = new ScrollCommand(request.timestamp);
-      scrollCommands.push(scrollCommand);
-      newCommand();
+      if (documentIdFound === 1 && connected === 1) {
+        checkURL(function(docId) {
+          if(docId === documentId) {
+            var scrollCommand = new ScrollCommand(request.timestamp);
+            scrollCommands.push(scrollCommand);
+            newCommand();
+          }
+        });
+      }
   } else if (request.type === "cursor") {
-    var cursorCommand = new CursorCommand(request.timestamp, request.left, request.top);
-    cursorCommands.push(cursorCommand);
-    newCommand();
+      if (documentIdFound === 1 && connected === 1) {
+        checkURL(function(docId) {
+          if(docId === documentId) {
+            var cursorCommand = new CursorCommand(request.timestamp, request.left, request.top);
+            cursorCommands.push(cursorCommand);
+            newCommand();
+          }
+        });
+      }
   }
 });
 
 //Web socket functionality 
-start("ws://classroom1.cs.unc.edu:5050");
-// start("ws://127.0.0.1:8080/");
+// start("ws://classroom1.cs.unc.edu:5050");
+start("ws://127.0.0.1:8080/");
 
-function start(websocketServerLocation){
+function start(websocketServerLocation) {
   ws = new WebSocket(websocketServerLocation);
   ws.onopen = function() {
   };
@@ -125,6 +106,11 @@ function start(websocketServerLocation){
       var data = evt.data;
       if (data === "Connected") {
         connected = 1;
+        //Once connected, send a docID. This covers the scenario when the user is already on the doc page when they connect.
+        //The checkURL funciton will determine if there is a docID to send. 
+        checkURL(sendDocId);
+      } else if (data === "handshake") {
+        ws.send("student");
       } else {
         var json = JSON.stringify(eval("(" + data + ")"));
         var jsonData = JSON.parse(json);
@@ -140,6 +126,9 @@ function start(websocketServerLocation){
     difficultyStatus = 'pending';
     //Notify content.js that the socket has closed
     sendToContent("close");
+    //set documentIdFound to false so you can find the next one
+    documentIdFound = 0;
+    documentId = null;
     //try to reconnect in 5 seconds
     setTimeout(function() {
       start(websocketServerLocation);
@@ -158,6 +147,7 @@ function newCommand() {
     //Prepare a JSON object to send to server
     var commandObject = {
       type: "command",
+      documentId : documentId,
       insertCommands : insertCommands,
       deleteCommands : deleteCommands,
       boldCommands : boldCommands,
@@ -173,6 +163,7 @@ function newCommand() {
       windowFocusCommands: windowFocusCommands,
       cursorCommands: cursorCommands
     };
+    console.log(deleteCommands);
     //Send the object
     ws.send(JSON.stringify(commandObject));
     //Reset all command arrays for the next bundle
@@ -265,16 +256,22 @@ chrome.webRequest.onBeforeRequest.addListener(
         //I think there is a better way to do this but this was the quickest fix
         if (documentIdFound === 1 && connected === 1) {
           checkURL(function(docId) {
-            if(docId === documentId) {
+            if(docId === documentId && data != null && data != undefined) {
               parseData(data);
             }
           });
         }
       } else if (request.url.indexOf('/sync?') != -1) {
         //this is a suggested revision or a comment
-        var collaborationCommand = new CollaborationCommand(Date.now());
-        collaborationCommands.push(collaborationCommand);
-        newCommand();
+        if (documentIdFound === 1 && connected === 1) {
+          checkURL(function(docId) {
+            if(docId === documentId) {
+              var collaborationCommand = new CollaborationCommand(Date.now());
+              collaborationCommands.push(collaborationCommand);
+              newCommand();
+            }
+          });
+        }
       }
     },
     { urls: ["*://*.google.com/*"] },
@@ -352,9 +349,11 @@ function processCommands(command, timeStamp) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   //If statement prevents commands from firing on refresh or iframe load
   if (changeInfo.url !== undefined) {
-    var updateURLCommand = new UpdateURLCommand(Date.now());
-    updateURLCommands.push(updateURLCommand);
-    newCommand();
+    if (documentIdFound === 1 && connected === 1) {
+      var updateURLCommand = new UpdateURLCommand(Date.now());
+      updateURLCommands.push(updateURLCommand);
+      newCommand();
+    }
   } else {
     //On refresh, make sure to resend the status to content.js
     sendToContent(difficultyStatus);
@@ -371,9 +370,11 @@ chrome.tabs.onActivated.addListener(function(tabId, changeInfo, tab) {
   if(documentIdFound === 0 && connected === 1) {
     checkURL(sendDocId);
   }
-  var switchTabCommand = new SwitchTabCommand(Date.now());
-  switchTabCommands.push(switchTabCommand);
-  newCommand();
+  if (documentIdFound === 1 && connected === 1) {
+    var switchTabCommand = new SwitchTabCommand(Date.now());
+    switchTabCommands.push(switchTabCommand);
+    newCommand();
+  }
 });
 
 //Function called on creating a tab (calls update and activate also)
@@ -382,9 +383,11 @@ chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
   if(documentIdFound === 0 && connected === 1) {
     checkURL(sendDocId);
   }
-  var createNewTabCommand = new CreateNewTabCommand(Date.now());
-  createNewTabCommands.push(createNewTabCommand);
-  newCommand();
+  if (documentIdFound === 1 && connected === 1) {
+    var createNewTabCommand = new CreateNewTabCommand(Date.now());
+    createNewTabCommands.push(createNewTabCommand);
+    newCommand();
+  }
 });
 
 //Function polls every 1000 ms (?) to detect if the Chrome browser is currently in focus
@@ -394,9 +397,11 @@ function checkBrowserFocus() {
     //Only log an event when a change in focus occurs
     if (browser.focused != chromeInFocus) {
       chromeInFocus = browser.focused;
-      var windowFocusCommand = new WindowFocusCommand(Date.now());
-      windowFocusCommands.push(windowFocusCommand);
-      newCommand();
+      if (documentIdFound === 1 && connected === 1) {
+        var windowFocusCommand = new WindowFocusCommand(Date.now());
+        windowFocusCommands.push(windowFocusCommand);
+        newCommand();
+      }
     }
   });
 }
@@ -441,87 +446,15 @@ function sendDocId(docId) {
 //as a timestamp (type long) on the server end
 function getNumericValFromDocId(docId) {
   switch(docId) {
-    case  "1utnT3bYBZJf_M3NFb7CBVqpop4pIdR_AnZBo6pcjr8s":
+    case  "10eVBvPyYNHGE_xOOoIGfKYkIIrDpg9tUfn8FuSyVKIA":
       return 1;
-    case "1cEe3hOc6hOQZbYrL1ojlIIPWqChNTIaP-rxDOhqVY4o":
+    case "1bYdF4RyvYVso2DG8MUMJI_DS-SdCJf3SBE5kbuNdtsM":
       return 2;
-    case "1znDjpT1DmRL5d55UK9GXhoicymICt7CE7lBmpyeEE-Y":
+    case "1iCHQpzQQJmhA67N8kKT4ry4m4wpyUShfD98h_LcxjjM":
       return 3;
-    case "16_j0WNLvvVlSUG0LcSCc_PRbmN0X8SpNUAI5gQ6DyiI":
-      return 4;
-    case "1PsNChRRfgorPLDNCls8n3IYGu0bq0aCQ2vK7hCOqmNA":
-      return 5;
-    case "1ZtHqc9NGtQ55E38xCzZBBCvNgAz2nWwrhvdf6-2eqPg":
-      return 6;
-    case "1R_42ciqJGjKPYLK8NX8VA2qnbw-LUSqjEnWjv-KtjG4":
-      return 7;
-    case "1YSSmozS3A-RBxzR-dQBgiz5dq4B0a1f9d8Kgunt0dmw":
-      return 8;
-    case "1_DqsfW4_v_SeNZpNRYRDnYnEDVwnRLPmbw9MIWvDkIk":
-      return 9;
-    case "1Zb55vT7OU27w9vPZdYNIbyBVbrsLuCSnnLsAG9nAsmA":
-      return 10;
-    case "1F7Oz6IVRmHgPKV1PvWkHlChtcaYS4J_XDT-CfzbBicw":
-      return 11;
-    case "173XESj7nTT3AtWOzR93BC-md5kDWalNED7hGC6MSrkg":
-      return 12;
-    case "1sqsPUagt8R_luTV6BXGRu51_d08T3Oh-dipgsVNE9dc":
-      return 13;
-    case "1jWTEgxOhUBkQx4qBd6Z91i6yib1R6mzfT3a_cOroUo4":
-      return 14;
-    case "10a6Kh-E5F2FnKew-I47bHTvIKdvC0EiCCyrcd2AUuEk":
-      return 15;
-    case "11vxDHg7KKZYjIi69jdlgEFXrcdNOUqmAoyoxIJCaDJY":
-      return 16;
-    case "1eCScFpbcEeqtJUyyy63boQ2AOIzfSP9XmXVkfMFiu7g":
-      return 17;
-    case "1ZXOHpZ8ez0m6efKIZ5M7li2mieQUrs4jsnx9JQm_AxY":
-      return 18;
-    case "1Obo7N7IPu2-muLJ43TjvAPy7v23W5LvFdMG1N-E-tzE":
-      return 19;
-    case "1FHM0P74zOzqiMSgghiMeb5mIDhjWj3z9qlK_K2k8C98":
-      return 20;
-    case "1aR6K2ld_Hn3fGq6wOaOQTp_vmvPlekhisGSxLOu9DkE":
-      return 21;
-    case "1t68zyyf6VWgkzWo50TO_yEzN_FUE56EO_3JlT7zz3Q0":
-      return 22;
-    case "1DSlcBm_NYHSZmmGWqk43xwex_Yo8M72M1VZ9ejMDCY0":
-      return 23;
-    case "1fc4WLpuRFP4fP6uwr0JmIYat9eFfR6lZJ3lHz-0steA":
-      return 24;
-    case "15z4a9HvKUYps56MARXffWTlVMFzcaVlP5vwLRvapEWM":
-      return 25;
-    case "1CEE4iEuw-6liGOrCOrv9cT68LigNoJDeIsqDYYVtjU0":
-      return 26;
-    case "1QykAhwwRunhp6QPEhaHSfxtqSAq0J7sdwiaf5JH5its":
-      return 27;
-    case "1kWQCeaWIRRsqbApb3zLrZm0qCRWqfDk48ewaIVUVnmw":
-      return 28;
-    case "1bQKmqyxqHweOanrgABlNUzUcVvyTMrNsaKrrC5g4YaU":
-      return 29;
-    case "1GWPnhLkICgXJYpFxyOFtxFquJgFLJ1WhnqKtSMUJ9Hs":
-      return 30;
-    case "1_0wSnzPhcZ6Pwd-elcnu-3i2c8VAPdNizSZdKX6yirE":
-      return 31;
-    case "1rxLuEdpFa1oIcvK3_YEiRfmC-AwwDsFXlrbf_s00O5Q":
-      return 32;
-    case "1ZMe6OhGZfsJWhJ3bHucyMICjBy9icvCaCzPJs3ofcYk":
-      return 33;
-    case "1xZONI7xDlb9qdltAdah6p9Ig3PLhOrOX9GtDUU_Mbu4":
-      return 34;
-    case "1hVrQjxkcoOkEnDGoclnXymjKizjiWyR6E_P5Py_H7R0":
-      return 35;
-    case "1XEyyogKV7lcNUuckPXnP6zKhhmg2zbA30suP7tb4WRk":
-      return 36;
-    case "1FSk_Coa86sSxN9LT4rpq4pCUtUjZKbv4_og6rLTWVMg":
-      return 37;
-    case "1AM11GlDR899B_1Skmz0s0D7sak-X_b7FVnu1l2PiEHk":
-      return 38;
-    case "1nMgO_pEiwpiqPoAOoendaqzu-cwmYW3QOQ9rpKFCQeM":
-      return 39;
-    case "15ZFb-5JC97-svNGSN9XhYnxoIrbFBIT0ntmMKCFfkgw":
-      return 40;
     default:
+        //This should never be called
+        console.log("Default case called");
         return 0;
   }
 }

@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.3.3.v20150827/lib/servlet-api-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EclipseHelper"/>
 	<classpathentry kind="lib" path="lib/eclipse-workbench-2.1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/Grader/oeall-22.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/1.7"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/jetty-http-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/jetty-io-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/jetty-server-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/jetty-servlets-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/jetty-util-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/websocket/websocket-server-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/websocket/websocket-servlet-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/websocket/websocket-api-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/websocket/websocket-client-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jetty-distribution-9.2.15.v20160210/lib/websocket/websocket-common-9.2.15.v20160210.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/json-20140107.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/javax.mail.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/jaf-1.1.1/activation.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/Downloads/swt-4.5-gtk-linux-x86_64/swt-debug.jar"/>
-	<classpathentry kind="lib" path="/Users/Duri/Downloads/swt-4.5-gtk-linux-x86_64/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="org.eclipse.swt"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/json-20140107.jar"/>
+	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/javax.mail.jar"/>
+	<classpathentry kind="lib" path="lib/oeall-22.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.8-bin.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-api-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-client-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-common-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-server-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-servlet-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-http-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-server-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlets-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-9.2.15.v20160210.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
