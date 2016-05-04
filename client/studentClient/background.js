@@ -24,7 +24,7 @@ var connected = 0;
 //Initialize status to pending so it will show up on Google Doc 
 var difficultyStatus = 'pending';
 //This is the number of commands we will send in each package to the server
-var commandPackageSize = 10;
+var commandPackageSize = 1;
 
 //List of the docIDs we are using for the study
 //This method of recording docIDs will need to be modified if this project is expanded
@@ -94,8 +94,8 @@ chrome.runtime.onMessage.addListener(function(request) {
 });
 
 //Web socket functionality 
-// start("ws://classroom1.cs.unc.edu:5050");
-start("ws://127.0.0.1:8080/");
+start("ws://classroom1.cs.unc.edu:5050");
+//start("ws://127.0.0.1:8080/");
 
 function start(websocketServerLocation) {
   ws = new WebSocket(websocketServerLocation);
@@ -163,7 +163,6 @@ function newCommand() {
       windowFocusCommands: windowFocusCommands,
       cursorCommands: cursorCommands
     };
-    console.log(deleteCommands);
     //Send the object
     ws.send(JSON.stringify(commandObject));
     //Reset all command arrays for the next bundle
@@ -202,12 +201,14 @@ var SpellcheckCommand = function(timeStamp, type) {
 };
 
 var DeleteCommand = function (timestamp, startIndex, endIndex) {
+  this.commandType = "delete";
   this.timeStamp = timestamp;
   this.startIndex = startIndex;
   this.endIndex = endIndex;
 };
 
 var InsertCommand = function (timestamp, index, content) {
+  this.commandType = "insert";
   this.timeStamp = timestamp;
   this.index = index;
   this.content = content;
@@ -256,7 +257,7 @@ chrome.webRequest.onBeforeRequest.addListener(
         //I think there is a better way to do this but this was the quickest fix
         if (documentIdFound === 1 && connected === 1) {
           checkURL(function(docId) {
-            if(docId === documentId && data != null && data != undefined) {
+            if(docId === documentId && data != null && data !== undefined) {
               parseData(data);
             }
           });

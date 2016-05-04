@@ -17,7 +17,6 @@ import javax.mail.internet.MimeMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import analyzer.ui.APredictionController;
 import commands.DocumentStatusCorrection;
 import config.FactorySingletonInitializer;
 import difficultyPrediction.APredictionParameters;
@@ -44,9 +43,8 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		try {
 			// localhost when running in Eclipse, classroom.cs.unc.edu or
 			// 152.2.130.35 when running on CS server
-//			client = new Socket("152.2.130.35", port);
-			//client = new Socket("152.2.130.35", port);
-			 client = new Socket("localhost", port);
+			client = new Socket("152.2.130.35", port);
+			//client = new Socket("localhost", port);
 			System.out.println("Client connected to " + client.getRemoteSocketAddress());
 			// Create a new client message receiver to receive messages from
 			// server

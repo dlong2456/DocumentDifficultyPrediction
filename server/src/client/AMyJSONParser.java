@@ -49,7 +49,7 @@ public class AMyJSONParser implements MyJSONParser {
 				idCommand.setTimestamp(longId);
 				predictionManager.setDocumentId(longId);
 				predictionManager.processEvent(idCommand);
-			}
+			} 
 		}
 		return obj;
 	}

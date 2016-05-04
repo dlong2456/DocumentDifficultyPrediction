@@ -13,17 +13,22 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+// TODO: Eventually, handle multiple teachers by using a SocketManager and broadcasting to all
 @WebSocket
 public class AMyWebSocket implements MyWebSocket {
 	private Session session;
 	private AServer server;
 	private static Session teacherSession;
+	private DocumentFileWriter writer;
 
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason) {
 		if (this.session == teacherSession) {
 			teacherSession = null;
 		} else {
+			// Close file writer
+			writer.finishWriting();
+			DocumentWriterManager.getInstance().part(writer);
 			// Remove this instance of AMyWebScocket form the SocketManager
 			SocketManager.getInstance().part(this);
 			// Close the server
@@ -77,10 +82,46 @@ public class AMyWebSocket implements MyWebSocket {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else if (message.contains("wholeDocument")) {
+			JSONObject obj = new JSONObject(message);
+			String docId = obj.getString("documentId");
+			DocumentFileWriter fw = DocumentWriterManager.getInstance().getWriterById(docId);
+			if (fw != null) {
+				String wholeDoc = fw.getWholeFile(docId);
+				sendMessage(wholeDoc);
+			}
+		} else if (message.contains("documentFromBeginning")) {
+			JSONObject obj = new JSONObject(message);
+			String docId = obj.getString("documentId");
+			long endTime = obj.getLong("endTime");
+			DocumentFileWriter fw = DocumentWriterManager.getInstance().getWriterById(docId);
+			if (fw != null) {
+				String returnString = fw.getFileFromBeginning(endTime, docId);
+				sendMessage(returnString);
+			}
+		} else if (message.contains("documentToEnd")) {
+			JSONObject obj = new JSONObject(message);
+			String docId = obj.getString("documentId");
+			DocumentFileWriter fw = DocumentWriterManager.getInstance().getWriterById(docId);
+			if (fw != null) {
+				String returnString = fw.getFileToEnd(docId);
+				sendMessage(returnString);
+			}
+		} else if (message.contains("statusHistory")) {
+
 		} else {
-			System.out.println("MESSAGE RECEIVED: " + message);
 			if (server != null) {
 				server.sendMessageToClient(message);
+			}
+			if (message.contains("documentId")) {
+				JSONObject obj = new JSONObject(message);
+				if (obj.get("type").equals("documentId")) {
+					String docIdString = obj.getString("documentIdString");
+					// Create a new file writer
+					writer = new ADocumentFileWriter();
+					DocumentWriterManager.getInstance().join(writer, docIdString);
+					writer.startWritingToDocument(docIdString);
+				}
 			}
 		}
 	}
@@ -103,6 +144,9 @@ public class AMyWebSocket implements MyWebSocket {
 				System.out.println("Teacher Session Null");
 			}
 			try {
+				if (writer != null) {
+					writer.recordCommand(message);
+				}
 				JSONObject obj = new JSONObject(message);
 				if (!(obj.has("documentId") && obj.has("status"))) {
 					getSession().getRemote().sendString(message);
@@ -117,4 +161,5 @@ public class AMyWebSocket implements MyWebSocket {
 			e.printStackTrace();
 		}
 	}
+
 }
