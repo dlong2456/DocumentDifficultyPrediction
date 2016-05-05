@@ -32,7 +32,19 @@ var commandPackageSize = 1;
 var docIDList = [
 "10eVBvPyYNHGE_xOOoIGfKYkIIrDpg9tUfn8FuSyVKIA",
 "1bYdF4RyvYVso2DG8MUMJI_DS-SdCJf3SBE5kbuNdtsM",
-"1iCHQpzQQJmhA67N8kKT4ry4m4wpyUShfD98h_LcxjjM"
+"1iCHQpzQQJmhA67N8kKT4ry4m4wpyUShfD98h_LcxjjM",
+"1_tjfJw5PVjIN5tAPdqcZVb-JbLL80tK37UvvHe4k99s",
+"12tDCOa49p4v2YAlUZcWeTcG4mEEwnHCIo5llK-CG_AE",
+"1tewK5J3SahTEpmI8fK7ysOMyw1A2YXmo7YYnXeifodw",
+"1cd84ENdhHDedHof7SqTdPsTCR-q0_gznpXMqvZjK2ig",
+"140VGIGoJclns_FsFAiQzkCfsLrOrFdgGXvGqqiTaTVo",
+"1So6TnMHyX4DOdxMmINXJvOE6nqeu_wQ1dWkFUu9xkFI",
+"1bppUUXYTiG-qRTABLlLd8Cpr78dvt4P_qHNvzYtIXsk",
+"1EmRjXnlye6nhoSVXNZ9NLyvaCufg2O3uhzQN2hnNJfc",
+"1m-0PD_s8Lre0wBARDeqsND8UrrE7EpLRglp3cxkFFKA",
+"1_QRQ3Cgr4lK_SzYz9F8fQrDnjuGksDnB9WTZFcfW6Xo",
+"12hY8UpF4KGIIVxWcjnvIMV26jq55cIuCrEk7qhG7t04",
+"1PQMwWJPxh4lcSC4xrcrjfcM4_vUF9owAG5D60DjBpgo"
 ];
 
 //MESSAGE PASSING
@@ -453,6 +465,30 @@ function getNumericValFromDocId(docId) {
       return 2;
     case "1iCHQpzQQJmhA67N8kKT4ry4m4wpyUShfD98h_LcxjjM":
       return 3;
+    case "1_tjfJw5PVjIN5tAPdqcZVb-JbLL80tK37UvvHe4k99s":
+      return 4;
+    case "12tDCOa49p4v2YAlUZcWeTcG4mEEwnHCIo5llK-CG_AE":
+      return 5;
+    case "1tewK5J3SahTEpmI8fK7ysOMyw1A2YXmo7YYnXeifodw":
+      return 6;
+    case "1cd84ENdhHDedHof7SqTdPsTCR-q0_gznpXMqvZjK2ig":
+      return 7;
+    case "140VGIGoJclns_FsFAiQzkCfsLrOrFdgGXvGqqiTaTVo":
+      return 8;
+    case "1So6TnMHyX4DOdxMmINXJvOE6nqeu_wQ1dWkFUu9xkFI":
+      return 9;
+    case "1bppUUXYTiG-qRTABLlLd8Cpr78dvt4P_qHNvzYtIXsk":
+      return 10;
+    case "1EmRjXnlye6nhoSVXNZ9NLyvaCufg2O3uhzQN2hnNJfc":
+      return 11;
+    case "1m-0PD_s8Lre0wBARDeqsND8UrrE7EpLRglp3cxkFFKA":
+      return 12;
+    case "1_QRQ3Cgr4lK_SzYz9F8fQrDnjuGksDnB9WTZFcfW6Xo":
+      return 13;
+    case "12hY8UpF4KGIIVxWcjnvIMV26jq55cIuCrEk7qhG7t04":
+      return 14;
+    case "1PQMwWJPxh4lcSC4xrcrjfcM4_vUF9owAG5D60DjBpgo":
+      return 15;
     default:
         //This should never be called
         console.log("Default case called");

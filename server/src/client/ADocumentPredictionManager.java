@@ -26,12 +26,14 @@ import difficultyPrediction.metrics.CommandClassificationSchemeName;
 import edu.cmu.scs.fluorite.commands.DifficulyStatusCommand.Status;
 import edu.cmu.scs.fluorite.commands.ICommand;
 import edu.cmu.scs.fluorite.model.EventRecorder;
+import server.HttpStuff;
 
 public class ADocumentPredictionManager implements DocumentPredictionManager {
 	private static int currentStatus; // 0 for making progress, 1 for facing
 										// difficulty
 	private static Socket client;
 	private long documentId;
+	private String docIdString;
 
 	public static void main(String[] args) {
 		System.out.println("Client created");
@@ -100,9 +102,11 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		// If student is struggling, then send an email to notify the
 		// teacher.
 		if (aStatus != currentStatus && aStatus == 1) {
+			currentStatus = aStatus;
 			sendEmail();
 		}
 		currentStatus = aStatus;
+		sendUpdateToTeacherView();
 		System.out.println("NEW STATUS: " + currentStatus);
 		// Send the prediction to be displayed to the student.
 		sendMessageToServer("{ status: '" + currentStatus + "'}");
@@ -113,6 +117,7 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 		int newStatus = obj.getInt("facingDifficulty");
 		if (newStatus != currentStatus) {
 			currentStatus = newStatus;
+			sendUpdateToTeacherView();
 			Status status;
 			if (currentStatus == 0) {
 				status = Status.Making_Progress;
@@ -170,15 +175,24 @@ public class ADocumentPredictionManager implements DocumentPredictionManager {
 	public void setStatus(int newStatus) {
 		currentStatus = newStatus;
 	}
+	
+	public void setDocumentIdString(String docIdString) {
+		this.docIdString = docIdString;
+	}
 
 	@Override
 	public void newReplayedStatus(int aStatus) {
 		// TODO Auto-generated method stub
 
 	}
+	
+	private void sendUpdateToTeacherView() {
+		long currentTime = System.currentTimeMillis();
+		sendMessageToServer("{ commandType: status, timeStamp: " +  currentTime + ", documentId: " + docIdString + " , status: '" + currentStatus + "'}");
+	}
 
 	private void sendEmail() {
-		sendMessageToServer("{ documentId: " + documentId + " , status: '" + currentStatus + "'}");
+		//sendMessageToServer("{ documentId: " + documentId + " , status: '" + currentStatus + "'}");
 		// Recipient's email ID needs to be specified
 		String to = "documenthelper1@gmail.com";
 

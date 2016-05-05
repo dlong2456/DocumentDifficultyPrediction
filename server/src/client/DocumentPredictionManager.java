@@ -21,4 +21,6 @@ public interface DocumentPredictionManager extends StatusListener {
 
 	public void sendMessageToServer(String message);
 
+	public void setDocumentIdString(String docIdString);
+
 }

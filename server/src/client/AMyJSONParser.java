@@ -47,6 +47,7 @@ public class AMyJSONParser implements MyJSONParser {
 				((ADocumentIdCommand) idCommand).setDocumentIdLong(longId);
 				((ADocumentIdCommand) idCommand).setDocumentIdString(docIdString);
 				idCommand.setTimestamp(longId);
+				predictionManager.setDocumentIdString(docIdString);
 				predictionManager.setDocumentId(longId);
 				predictionManager.processEvent(idCommand);
 			} 

@@ -26,8 +26,14 @@ public class DocumentWriterManager {
 	}
 
 	public DocumentFileWriter getWriterById(String docId) {
+		DocumentFileWriter fw = null;
+		try {
 		int index = documentIds.indexOf(docId);
-		return documentWriters.get(index);
+		fw = documentWriters.get(index);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			//Let fw return as null. Web socket will handle the rest. 
+		}
+		return fw;
 	}
 
 }

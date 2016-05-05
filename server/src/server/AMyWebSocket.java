@@ -20,6 +20,7 @@ public class AMyWebSocket implements MyWebSocket {
 	private AServer server;
 	private static Session teacherSession;
 	private DocumentFileWriter writer;
+	private HttpStuff http = new HttpStuff();
 
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason) {
@@ -89,26 +90,46 @@ public class AMyWebSocket implements MyWebSocket {
 			if (fw != null) {
 				String wholeDoc = fw.getWholeFile(docId);
 				sendMessage(wholeDoc);
+			} else {
+				sendMessage("documentNotFound");
 			}
 		} else if (message.contains("documentFromBeginning")) {
 			JSONObject obj = new JSONObject(message);
 			String docId = obj.getString("documentId");
-			long endTime = obj.getLong("endTime");
+			int percentage = obj.getInt("percentage");
 			DocumentFileWriter fw = DocumentWriterManager.getInstance().getWriterById(docId);
 			if (fw != null) {
-				String returnString = fw.getFileFromBeginning(endTime, docId);
+				String returnString = fw.getFileFromBeginning(percentage, docId);
 				sendMessage(returnString);
+			} else {
+				sendMessage("documentNotFound");
 			}
-		} else if (message.contains("documentToEnd")) {
+		} else if (message.contains("documentSubstring")) {
 			JSONObject obj = new JSONObject(message);
 			String docId = obj.getString("documentId");
+			int index = obj.getInt("index");
+			int substringLength = obj.getInt("substringLength");
 			DocumentFileWriter fw = DocumentWriterManager.getInstance().getWriterById(docId);
 			if (fw != null) {
-				String returnString = fw.getFileToEnd(docId);
+				String returnString = fw.getSubstringFromIndex(docId, index, substringLength);
 				sendMessage(returnString);
+			} else {
+				// might be more accurate to send substring too long or
+				// something
+				sendMessage("documentNotFound");
 			}
-		} else if (message.contains("statusHistory")) {
-
+		} else if (message.contains("statusGivenPercentage")) {
+			System.out.println("STATUS GIVEN PERCENTAGE");
+			JSONObject obj = new JSONObject(message);
+			String docId = obj.getString("documentId");
+			int percentage = obj.getInt("percentage");
+			DocumentFileWriter fw = DocumentWriterManager.getInstance().getWriterById(docId);
+			if (fw != null) {
+				String returnString = fw.getStatusGivenPercentage(percentage, docId);
+				sendMessage(returnString);
+			} else {
+				sendMessage("documentNotFound");
+			}
 		} else {
 			if (server != null) {
 				server.sendMessageToClient(message);
@@ -137,28 +158,42 @@ public class AMyWebSocket implements MyWebSocket {
 	// Send message to the web client
 	public void sendMessage(String message) {
 		System.out.println("OUTGOING MESSAGE: " + message);
-		try {
-			if (teacherSession != null) {
-				teacherSession.getRemote().sendString(message);
-			} else {
-				System.out.println("Teacher Session Null");
-			}
+		if (message != null) {
 			try {
-				if (writer != null) {
-					writer.recordCommand(message);
+				if (teacherSession != null) {
+					teacherSession.getRemote().sendString(message);
+				} else {
+					System.out.println("Teacher Session Null");
 				}
-				JSONObject obj = new JSONObject(message);
-				if (!(obj.has("documentId") && obj.has("status"))) {
+				try {
+					if (writer != null && message != null) {
+						writer.recordCommand(message);
+					}
+					JSONObject obj = new JSONObject(message);
+					if (!(obj.has("documentId") && obj.has("status"))) {
+						getSession().getRemote().sendString(message);
+					}
+					if (obj.has("status") && obj.has("documentId")) {
+						System.out.println("GETTING: " + obj);
+						System.out.println("HELLO");
+						String url = "http://comp156.cs.unc.edu/comp790/document.php?update&status=" + obj.getString("status")+ "&documentID=" + obj.getString("documentId");
+						System.out.println("URL " + url);
+						http.sendGet(url);
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+					// This exception will be thrown if the message can't be
+					// parsed
+					// into a JSON object.
+					// In this case we will still send it to the student
 					getSession().getRemote().sendString(message);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			} catch (JSONException e) {
-				// This exception will be thrown if the message can't be parsed
-				// into a JSON object.
-				// In this case we will still send it to the student
-				getSession().getRemote().sendString(message);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
